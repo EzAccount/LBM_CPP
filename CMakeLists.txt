@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.10)
+project(LBM_CPP)
+
+set(CMAKE_CXX_STANDARD 11)
+
+add_executable(LBM_CPP main.cpp point.h constants.h)
