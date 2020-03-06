@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
     e[6].x = -1.;    e[6].y = 1.;
     e[7].x = -1.;    e[7].y = -1.;
     e[8].x = 1.;     e[8].y = -1.;
-    std::vector<double> r = {1., 0.1, -0.1, 1.};
+    std::vector<double> r = {2., 0.1, -0.1, 1.};
     Point p(r);
     p.macro();
     std::cout<<p.tau << " " << p.rho << " " << p.T <<" " << p.v.x << " " << p.v.y << " ";
