@@ -3,4 +3,4 @@ project(LBM_CPP)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(LBM_CPP main.cpp point.h constants.h)
+add_executable(LBM_CPP main.cpp point.h constants.h Armen.cpp)

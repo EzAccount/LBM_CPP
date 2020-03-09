@@ -23,14 +23,15 @@ public:
 
 };
 class Grid{
+    Grid(std::vector<std::pair<int, int>>);
     std::vector<std::vector<Point>> points;
-    bool is_possible(int, int,int);
-    void mirroring(int,int,int);
+    bool is_possible(int, int, int);
+    void mirroring(int, int, int);
     void transfer(int, int);
-    void at(int, int); // Do i need thtis one?
+    void at(int, int); // Do i need this one?
     void eval();
 public:
-    Grid(int, int);
+    int **desc_grid;
 };
 
 void Point::col() {
@@ -87,6 +88,47 @@ Point::Point(std::vector<double> init){
         f_temp[k] = f_eq[k];
     }
 }
+
+Grid::Grid(std::vector<std::pair<int, int>> indata){
+    int xmax = -100000, ymax = -100000, xmin = 100000, ymin = 100000;
+    for(int i = 0; i < indata.size(); ++i){
+        if (indata[i].first > xmax){
+            xmax = indata[i].first;
+        }
+        if (indata[i].second > ymax){
+            ymax = indata[i].second;
+        }
+        if (indata[i].first < xmin){
+            xmin = indata[i].first;
+        }
+        if (indata[i].second < ymin){
+            ymin = indata[i].second;
+        }
+    }
+    desc_grid = new int*[xmax-xmin];
+    for (int i = 0; i < xmax-xmin; i++)
+        desc_grid[i] = new int[ymax-ymin];
+    int flag = 0;
+    for(int i = 0; i < xmax - xmin; ++i){
+        for(int j = 0; j < ymax - ymin; ++j){
+            for(int k = 0; k < indata.size(); ++k){
+                if(i==indata[k].first &&
+                   j==indata[k].second)
+                {
+                    desc_grid[i][j] = 0;
+                    flag = 1;
+                    break;
+                }
+            }
+            if (flag==0){
+                desc_grid[i][j] = -1;
+            } else flag = 0;
+        }
+    }
+
+
+}
+
 
 bool Grid::is_possible(int x, int y, int k) {
     // add check for k corresponding to speed/2 [speed/3, etc]
