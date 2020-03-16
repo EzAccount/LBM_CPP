@@ -7,14 +7,21 @@
 #include <iostream>
 #include <vector>
 #include <array>
+#include <algorithm>
 #include "constants.h"
 
 
 class Point{
 public:
+<<<<<<< HEAD
     std::array<double, Q> f_temp, f_eq; // TODO:vectors?
     std::vector<double> f(Q);
     double tau, T, rho, P;
+=======
+    std::array<double, Q> f, f_temp, f_eq;
+    double tau, T, rho;
+    bool exist;
+>>>>>>> c39cfdb4e704becfa8ba9c1161b0903ea824f8fe
     Vector<double> v;
     void eq(); // TODO: check
     void col(); // TODO: implement
@@ -24,7 +31,9 @@ public:
 
 };
 class Grid{
+    Grid(std::vector<std::pair<int, int>>);
     std::vector<std::vector<Point>> points;
+<<<<<<< HEAD
     bool is_possible(int, int,int);  // TODO: is needed?
     void mirroring(int,int,int);  // TODO: boundaries
     void transfer(int, int); // TODO: standalone function
@@ -32,6 +41,15 @@ class Grid{
     void eval();
 public:
     std::array<double,5> macro_at(size_t, size_t); // TODO: result output
+=======
+    bool is_possible(int, int, int);
+    void mirroring(int, int, int);
+    void transfer(int, int);
+    void at(int, int); // Do i need this one?
+    void eval();
+public:
+    Point **desc_grid;
+>>>>>>> c39cfdb4e704becfa8ba9c1161b0903ea824f8fe
 };
 
 void Point::col() {
@@ -88,6 +106,37 @@ Point::Point(std::vector<double> init){
         f_temp[k] = f_eq[k];
     }
 }
+
+Grid::Grid(std::vector<std::pair<int, int>> indata){
+    int xmax = 0, ymax = 0, xmin = 0, ymin = 0;
+    for(int i = 0; i < indata.size(); ++i) {
+        xmax = std::max_element(indata[i].first, indata[i].first);
+        ymax = std::max_element(indata[i].second, indata[i].second);
+        xmin = std::min_element(indata[i].first, indata[i].first);
+        ymin = std::min_element(indata[i].second, indata[i].second);
+    }
+    desc_grid = new Point*[xmax-xmin];
+    for (int i = 0; i < xmax-xmin; i++)
+        desc_grid[i] = new Point[ymax-ymin];
+    int flag = 0;
+    for(int i = 0; i < xmax - xmin; ++i){
+        for(int j = 0; j < ymax - ymin; ++j){
+            for(int k = 0; k < indata.size(); ++k){
+                if(i==indata[k].first &&
+                   j==indata[k].second)
+                {
+                    desc_grid[i][j].exist = 0;
+                    flag = 1;
+                    break;
+                }
+            }
+            if (flag==0){
+                desc_grid[i][j].exist = 0;
+            } else flag = 0;
+        }
+    }
+}
+
 
 bool Grid::is_possible(int x, int y, int k) {
     // add check for k corresponding to speed/2 [speed/3, etc]
