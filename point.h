@@ -13,15 +13,13 @@
 
 class Point{
 public:
-<<<<<<< HEAD
-    std::array<double, Q> f_temp, f_eq; // TODO:vectors?
+
+    std::array<double, Q> f, f_temp, f_eq; // TODO:vectors?
     std::vector<double> f(Q);
     double tau, T, rho, P;
-=======
-    std::array<double, Q> f, f_temp, f_eq;
-    double tau, T, rho;
+
     bool exist;
->>>>>>> c39cfdb4e704becfa8ba9c1161b0903ea824f8fe
+
     Vector<double> v;
     void eq(); // TODO: check
     void col(); // TODO: implement
@@ -33,7 +31,6 @@ public:
 class Grid{
     Grid(std::vector<std::pair<int, int>>);
     std::vector<std::vector<Point>> points;
-<<<<<<< HEAD
     bool is_possible(int, int,int);  // TODO: is needed?
     void mirroring(int,int,int);  // TODO: boundaries
     void transfer(int, int); // TODO: standalone function
@@ -41,15 +38,9 @@ class Grid{
     void eval();
 public:
     std::array<double,5> macro_at(size_t, size_t); // TODO: result output
-=======
-    bool is_possible(int, int, int);
-    void mirroring(int, int, int);
-    void transfer(int, int);
-    void at(int, int); // Do i need this one?
-    void eval();
 public:
     Point **desc_grid;
->>>>>>> c39cfdb4e704becfa8ba9c1161b0903ea824f8fe
+
 };
 
 void Point::col() {
