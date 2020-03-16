@@ -109,11 +109,15 @@ Point::Point(std::vector<double> init){
 
 Grid::Grid(std::vector<std::pair<int, int>> indata){
     int xmax = 0, ymax = 0, xmin = 0, ymin = 0;
+    xmax = indata[0].first;
+    xmin = indata[0].first;
+    ymax = indata[0].second;
+    ymin = indata[0].second;
     for(int i = 0; i < indata.size(); ++i) {
-        xmax = std::max_element(indata[i].first, indata[i].first);
-        ymax = std::max_element(indata[i].second, indata[i].second);
-        xmin = std::min_element(indata[i].first, indata[i].first);
-        ymin = std::min_element(indata[i].second, indata[i].second);
+        xmax = std::max_element(xmax, indata[i].first);
+        ymax = std::max_element(ymax, indata[i].second);
+        xmin = std::min_element(xmin, indata[i].first);
+        ymin = std::min_element(ymin, indata[i].second);
     }
     desc_grid = new Point*[xmax-xmin];
     for (int i = 0; i < xmax-xmin; i++)

@@ -41,14 +41,9 @@ int main(int argc, char **argv) {
     e[5].x = 1.;     e[5].y = 1.;
     e[6].x = -1.;    e[6].y = 1.;
     e[7].x = -1.;    e[7].y = -1.;
-<<<<<<< HEAD
-    e[8].x = 1.;     e[8].y = -1.;
-    std::array<double,5> r = {1.,1., 0.1, -0.1, 1.};
-    Point p(r);
-=======
+
     e[8].x = 1.;     e[8].y = -1.;*/
-    std::vector<double> r = {1., 0.1, -0.1, 1.};
->>>>>>> c39cfdb4e704becfa8ba9c1161b0903ea824f8fe
+    std::vector<double> p = {1., 0.1, -0.1, 1.};
     p.macro();
     std::cout<<p.tau << " " << p.rho << " " << p.T <<" " << p.v.x << " " << p.v.y << " ";
     std::cout << std::endl;
