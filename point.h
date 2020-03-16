@@ -12,25 +12,26 @@
 
 class Point{
 public:
-    std::array<double, Q> f, f_temp, f_eq;
-    double tau, T, rho;
+    std::array<double, Q> f_temp, f_eq; // TODO:vectors?
+    std::vector<double> f(Q);
+    double tau, T, rho, P;
     Vector<double> v;
-    void eq();
-    void col();
-    void macro();
+    void eq(); // TODO: check
+    void col(); // TODO: implement
+    void macro(); // TODO:check
     Point();
-    Point(std::vector<double>);
+    Point(std::array<double,5>);// TODO: initials
 
 };
 class Grid{
     std::vector<std::vector<Point>> points;
-    bool is_possible(int, int,int);
-    void mirroring(int,int,int);
-    void transfer(int, int);
-    void at(int, int); // Do i need thtis one?
+    bool is_possible(int, int,int);  // TODO: is needed?
+    void mirroring(int,int,int);  // TODO: boundaries
+    void transfer(int, int); // TODO: standalone function
+    void at(int, int); // TODO: is this needed?
     void eval();
 public:
-    Grid(int, int);
+    std::array<double,5> macro_at(size_t, size_t); // TODO: result output
 };
 
 void Point::col() {

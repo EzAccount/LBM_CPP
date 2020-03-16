@@ -9,7 +9,7 @@
 #include <array>
 
 template <typename T>
-struct Vector{
+struct Vector{ // TODO: is this needed for velocity?
     T x;
     T y;
     Vector() {
@@ -48,7 +48,7 @@ struct Vector{
 };
 
 
-constexpr size_t Q = 9;
+constexpr std::size_t Q = 9;
 double Pr = 2./3;
 double Kn = 0.08;
 size_t iterations = 1000;
