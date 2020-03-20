@@ -9,7 +9,7 @@
 #include <array>
 
 template <typename T>
-struct Vector{ // TODO: is this needed for velocity?
+struct Vector{
     T x;
     T y;
     Vector() {
@@ -29,7 +29,7 @@ struct Vector{ // TODO: is this needed for velocity?
         this->y += rhs.y;
         return *this;
     }
-    friend Vector operator+(Vector<T> lhs, const Vector<T>& rhs ){
+    friend Vector operator+(Vector<T> lhs, const Vector<T>& rhs){
         lhs += rhs;
         return lhs;
     }

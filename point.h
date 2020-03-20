@@ -13,19 +13,17 @@
 
 class Point{
 public:
-
-    std::array<double, Q> f, f_temp, f_eq; // TODO:vectors?
-    std::vector<double> f(Q);
+    std::array<double, Q> f, f_temp, f_eq;
     double tau, T, rho, P;
 
     bool exist;
 
     Vector<double> v;
-    void eq(); // TODO: check
+    void eq();
     void col(); // TODO: implement
     void macro(); // TODO:check
     Point();
-    Point(std::array<double,5>);// TODO: initials
+    Point(std::array<double, 4>);// TODO: initials
 
 };
 class Grid{
@@ -33,27 +31,27 @@ class Grid{
     std::vector<std::vector<Point>> points;
     bool is_possible(int, int,int);  // TODO: is needed?
     void mirroring(int,int,int);  // TODO: boundaries
+    void boundaries(Point **desc_grid);
     void transfer(int, int); // TODO: standalone function
     void at(int, int); // TODO: is this needed?
     void eval();
 public:
     std::array<double,5> macro_at(size_t, size_t); // TODO: result output
-public:
     Point **desc_grid;
-
+    bool **bound_grid;
 };
 
 void Point::col() {
-    for (size_t k=0; k<Q; ++k)
+    for (size_t k = 0; k < Q; ++k)
     {
         f[k] = f_temp[k] - 1./tau * (f_temp[k] -  f_eq[k]);
     }
 }
 void Point::eq() {
     double c = T;
-    for (size_t k=0; k<Q; ++k){
+    for (size_t k = 0; k < Q; ++k){
         double sc = e[k] * v;
-        f_eq[k] = rho * w[k] * (1. + 3 * sc/c + 4.5 * sc * sc / c / c -  v * v * 1.5/ c);
+        f_eq[k] = rho * w[k] * (1. + 3 * sc/c + 4.5 * sc * sc / c / c -  v * v * 1.5/ c / c);
     }
 
 }
@@ -64,12 +62,12 @@ void Point::macro() {
         rho+=f_temp[k];
     }
     T = 0;
-    for (size_t k=0; k<Q; ++k){
+    for (size_t k = 0; k < Q; ++k){
         T += (e[k] - v)*(e[k] - v) * f_temp[k] * 3/2;
     }
     v.x = 0;
     v.y = 0;
-    for (size_t k=0; k<Q; ++k){
+    for (size_t k = 0; k < Q; ++k){
         v += f_temp[k] / rho * e[k];
     }
 }
@@ -85,14 +83,14 @@ Point::Point() {
         f_temp[k] = f_eq[k];
     }
 }
-Point::Point(std::vector<double> init){
+Point::Point(std::array<double, 4> init){
     tau = 0.;
     T = init[3];
     rho = init[0];
     v.x = init[1];
     v.y = init[2];
     eq();
-    for (int k=0; k<Q; ++k){
+    for (int k = 0; k < Q; ++k){
         f[k] = f_eq[k];
         f_temp[k] = f_eq[k];
     }
@@ -145,8 +143,31 @@ void Grid::transfer(int x, int y) {
         if (is_possible(x,y,k)) points[x+e[k].x][y+e[k].y].f_temp[k] = points[x][y].f[k];
     }
 }
-
-
+void Grid::boundaries(Point **grid){
+    bound_grid = new bool*[sizeof(grid)];
+    for (unsigned int i = 0; i < sizeof(grid); i++)
+        bound_grid[i] = new bool[sizeof(*grid)];
+    for(int i = 0; i < sizeof(grid); ++i){
+        for(int j = 0; j < sizeof(*grid); ++j){
+            if(grid[i][j].exist){
+                if (i==0 || j==0 || i==sizeof(grid) || j==sizeof(*grid)){
+                    bound_grid[i][j] = 1;// Если точка на границе сетки, то она -- граница
+                }
+                else {
+                    int count = 0;
+                    for (int a = -1; a < 1; ++a) {
+                        for (int b = -1; b < 1; ++b) {
+                            count += grid[i + a][j + b].exist;
+                            /*счётчик во всех направлениях. если хотя бы по 1 направлению
+                            точка не принадлежит сетке, то исходная точка i j на границе*/
+                        }
+                    }
+                }
+                bound_grid[i][j] = count < 9;
+            } else bound_grid[i][j] = false;
+        }
+    }
+}
 
 
 
