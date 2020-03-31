@@ -23,7 +23,7 @@ double*  vec_mul(double *a, double b) // vector * scalar
     a[0] *= b;
     a[1] *= b;
     return a;
-}*/ //Do i need this func?
+}*/
 
 int main(int argc, char **argv) {
     if (argc > 2){

@@ -20,16 +20,10 @@ public:
   void eq();
   void col();
   void macro(); // TODO:check
-  Point();
-  Point(double, double, Vector<double>, double);
+  explicit Point(double = 0., double = 0., Vector<double> = 0., double = 0.);
 };
 class Grid {
   Grid(std::vector<std::pair<int, int>>);
-  /***
-   *
-   * @param points
-   * this func will find points on the bound
-   */
   void boundaries();
   void transfer(int, int);
   void eval();
@@ -66,13 +60,6 @@ void Point::macro() {
     v += f_temp[k] / rho * e[k];
   }
 }
-Point::Point() : tau(0.), T(0.), rho(0.), v(0., 0.), P(0.) {
-  eq();
-  for (int k = 0; k < Q; ++k) {
-    f[k] = f_eq[k];
-    f_temp[k] = f_eq[k];
-  }
-}
 
 Point::Point(double rho, double T, Vector<double> v, double P)
     : tau(0.), T(T), rho(rho), v(v), P(P) {
@@ -84,17 +71,21 @@ Point::Point(double rho, double T, Vector<double> v, double P)
 }
 
 Grid::Grid(std::vector<std::pair<int, int>> indata) {
-  int xmax = 0, ymax = 0, xmin = 0, ymin = 0;
-  xmax = indata[0].first;
-  xmin = indata[0].first;
-  ymax = indata[0].second;
-  ymin = indata[0].second;
-  for (int i = 0; i < indata.size(); ++i) {
-    xmax = std::max_element(xmax, indata[i].first);
-    ymax = std::max_element(ymax, indata[i].second);
-    xmin = std::min_element(xmin, indata[i].first);
-    ymin = std::min_element(ymin, indata[i].second);
-  }
+  int xmax, ymax, xmin, ymin;
+  auto result = std::minmax_element(
+      indata.begin(), indata.end(),
+      [&](const std::pair<int, int> &a, const std::pair<int, int> &b) {
+        return a.first < b.first;
+      });
+  xmin = indata[result.first - indata.begin()].first;
+  xmax = indata[result.second - indata.begin()].first;
+  result = std::minmax_element(
+      indata.begin(), indata.end(),
+      [&](const std::pair<int, int> &a, const std::pair<int, int> &b) {
+        return a.second < b.second;
+      });
+  ymin = indata[result.first - indata.begin()].second;
+  ymax = indata[result.second - indata.begin()].second;
   int flag = 0;
   for (int i = 0; i < xmax - xmin; ++i) {
     for (int j = 0; j < ymax - ymin; ++j) {
@@ -114,11 +105,23 @@ Grid::Grid(std::vector<std::pair<int, int>> indata) {
 }
 
 void Grid::transfer(int x, int y) {
-  for (size_t k = 0; k < Q; ++k) {
-    if (grid[x][y].exist)
-      grid[x + e[k].x][y + e[k].y].f_temp[k] = points[x][y].f[k];
+  if (grid[x][y].bound) {
+    for (size_t k = 0; k < Q; ++k) {
+      if (grid[x + e[k].x][y].bound && !grid[x][y + e[k].y].bound) {
+        e[k].y = -e[k].y;
+      }
+      if (!grid[x + e[k].x][y].bound && grid[x][y + e[k].y].bound) {
+        e[k].x = -e[k].x;
+      }
+      if (grid[x][y].exist) {
+        grid[x + e[k].x][y + e[k].y].f_temp[k] = grid[x][y].f[k];
+      }
+    }
   }
 }
+/***
+ * this func will find points on the bound
+ */
 void Grid::boundaries() {
   int count = 0;
   for (size_t i = 0; i < grid.size(); ++i) {

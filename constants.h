@@ -11,14 +11,7 @@
 template <typename T> struct Vector {
   T x;
   T y;
-  Vector() {
-    x = 0;
-    y = 0;
-  }
-  Vector(T a, T b) {
-    x = a;
-    y = b;
-  }
+  Vector(T x=0, T y=0) : x(x), y(y) {}
   T operator*(const Vector<T> &rhs) const {
 
     return this->x * rhs.x + this->y * rhs.y;
