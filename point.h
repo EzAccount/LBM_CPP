@@ -105,17 +105,17 @@ Grid::Grid(std::vector<std::pair<int, int>> indata) {
 }
 
 void Grid::transfer(int x, int y) {
-  if (grid[x][y].bound) {
-    for (size_t k = 0; k < Q; ++k) {
+  for (size_t k = 0; k < Q; ++k) {
+    if (grid[x][y].bound) {
       if (grid[x + e[k].x][y].bound && !grid[x][y + e[k].y].bound) {
         e[k].y = -e[k].y;
       }
       if (!grid[x + e[k].x][y].bound && grid[x][y + e[k].y].bound) {
         e[k].x = -e[k].x;
       }
-      if (grid[x][y].exist) {
-        grid[x + e[k].x][y + e[k].y].f_temp[k] = grid[x][y].f[k];
-      }
+    }
+    if (grid[x][y].exist) {
+      grid[x + e[k].x][y + e[k].y].f_temp[k] = grid[x][y].f[k];
     }
   }
 }
