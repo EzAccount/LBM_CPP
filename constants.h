@@ -11,7 +11,7 @@
 template <typename T> struct Vector {
   T x;
   T y;
-  Vector(T x=0, T y=0) : x(x), y(y) {}
+  Vector(T x = 0, T y = 0) : x(x), y(y) {}
   T operator*(const Vector<T> &rhs) const {
 
     return this->x * rhs.x + this->y * rhs.y;
@@ -47,5 +47,5 @@ std::array<Vector<double>, Q> e;
 std::array<double, Q> w = {4. / 9,  1. / 9,  1. / 9,  1. / 9, 1. / 9,
                            1. / 36, 1. / 36, 1. / 36, 1. / 36};
 size_t x_size, y_size;
-
+size_t alpha = 0;
 #endif // LBM_CPP_CONSTANTS_H

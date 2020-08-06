@@ -3,13 +3,12 @@
 //
 #ifndef LBM_CPP_POINT_H
 #define LBM_CPP_POINT_H
-
 #include "constants.h"
 #include <algorithm>
 #include <array>
+#include <gtest/gtest.h>
 #include <iostream>
 #include <vector>
-
 class Point {
 public:
   std::array<double, Q> f, f_temp, f_eq;
@@ -23,13 +22,17 @@ public:
   explicit Point(double = 0., double = 0., Vector<double> = 0., double = 0.);
 };
 class Grid {
+public:
   Grid(std::vector<std::pair<int, int>>);
   void boundaries();
-  void transfer(int, int);
   void eval();
+  void transfer(int, int);
   std::array<double, 5> macro_at(size_t, size_t); // TODO: result output
 private:
   std::vector<std::vector<Point>> grid;
+  FRIEND_TEST(GridConstructor__Test, MAX_MIN_Test);
+  FRIEND_TEST(GridBoundaries__Test, Boundaries_Test);
+  FRIEND_TEST(GridTransfer__Test, Transfer_Test);
 };
 
 void Point::col() {
@@ -79,6 +82,11 @@ Grid::Grid(std::vector<std::pair<int, int>> indata) {
       });
   xmin = indata[result.first - indata.begin()].first;
   xmax = indata[result.second - indata.begin()].first;
+  for (auto k : indata) {
+    k.first -= xmin;
+  }
+  xmin = 0;
+  xmax -= xmin;
   result = std::minmax_element(
       indata.begin(), indata.end(),
       [&](const std::pair<int, int> &a, const std::pair<int, int> &b) {
@@ -86,9 +94,17 @@ Grid::Grid(std::vector<std::pair<int, int>> indata) {
       });
   ymin = indata[result.first - indata.begin()].second;
   ymax = indata[result.second - indata.begin()].second;
+  for (auto k : indata) {
+    k.second -= ymin;
+  }
+  ymin = 0;
+  ymax -= ymin;
   int flag = 0;
-  for (int i = 0; i < xmax - xmin; ++i) {
-    for (int j = 0; j < ymax - ymin; ++j) {
+  grid.resize(xmax + 1);
+  for (int i = 0; i < grid.size(); ++i)
+    grid[i].resize(ymax + 1);
+  for (int i = 0; i < grid.size(); ++i) {
+    for (int j = 0; j < grid[0].size(); ++j) {
       for (int k = 0; k < indata.size(); ++k) {
         if (i == indata[k].first && j == indata[k].second) {
           grid[i][j].exist = 1;
@@ -106,16 +122,44 @@ Grid::Grid(std::vector<std::pair<int, int>> indata) {
 
 void Grid::transfer(int x, int y) {
   for (size_t k = 0; k < Q; ++k) {
-    if (grid[x][y].bound) {
-      if (grid[x + e[k].x][y].bound && !grid[x][y + e[k].y].bound) {
-        e[k].y = -e[k].y;
-      }
-      if (!grid[x + e[k].x][y].bound && grid[x][y + e[k].y].bound) {
-        e[k].x = -e[k].x;
-      }
-    }
+    int k_temp = 0;
+    int x_cord = e[k].x, y_cord = e[k].y;
+    bool flag = false; //this flag is responsible for changing the direction of move
     if (grid[x][y].exist) {
-      grid[x + e[k].x][y + e[k].y].f_temp[k] = grid[x][y].f[k];
+      if (grid[x + e[k].x][y + e[k].y].bound) {
+        if (grid[x + e[k].x][y].bound) {
+          x_cord = -e[k].x;
+          flag = true;
+        }
+        if (grid[x][y + e[k].y].bound) {
+          y_cord = -e[k].y;
+          flag = true;
+        }
+        if(!flag) {
+          x_cord = -e[k].x;
+          y_cord = -e[k].y;
+          flag = true;
+        }
+      }
+      for (size_t j = 0; j < Q; ++j) {
+        if (e[j].x == x_cord && e[j].y == y_cord) {
+          k_temp = j;
+          break;
+        }
+      }
+      if(flag) {
+        grid[x + e[k].x + e[k_temp].x][y + e[k].y + e[k_temp].y].f_temp[k_temp] =
+            alpha * grid[x][y].f[k] +
+              (1 - alpha) *
+                (grid[x + e[k].x + e[k_temp].x][y + e[k].y + e[k_temp].y].f_eq[k_temp] -
+                   grid[x][y].f_eq[k_temp])/2;
+      } else {
+        grid[x + e[k].x][y + e[k].y].f_temp[k] =
+            alpha * grid[x][y].f[k] +
+            (1 - alpha) *
+            (grid[x + e[k].x][y + e[k].y].f_eq[k] -
+             grid[x][y].f_eq[k])/2;
+      }
     }
   }
 }
@@ -125,14 +169,12 @@ void Grid::transfer(int x, int y) {
 void Grid::boundaries() {
   int count = 0;
   for (size_t i = 0; i < grid.size(); ++i) {
-    for (size_t j = 0; j < grid[i].size(); ++j) {
+    for (size_t j = 0; j < grid[0].size(); ++j) {
       if (grid[i][j].exist) {
-        if (i == 0 || j == 0 || i == grid.size() || j == grid[i].size()) {
-          grid[i][j].bound = 1; // If point is on the boundary of the grid, then
-                                // it is the boundary
-        } else {
-          for (int a = -1; a <= 1; ++a) {
-            for (int b = -1; b <= 1; ++b) {
+        for (int a = -1; a <= 1; ++a) {
+          for (int b = -1; b <= 1; ++b) {
+            if (i + a < grid.size() && j + b < grid[0].size() && i + a >= 0 &&
+                i + b >= 0) {
               count += grid[i + a][j + b].exist;
               /*counter in all directions. if at least in 1 direction
               point does not belong to the grid, then the starting point i j
@@ -141,6 +183,7 @@ void Grid::boundaries() {
           }
         }
         grid[i][j].bound = count < 9;
+        count = 0;
       } else
         grid[i][j].bound = 0;
     }
