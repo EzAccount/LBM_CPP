@@ -1,6 +1,6 @@
 #include "point.h"
-#include<iostream>
-//typedef Point point;
+#include <iostream>
+// typedef Point point;
 
 /*double scalar(double *a, double *b) // dot product in R^2
 {
@@ -23,8 +23,7 @@ double*  vec_mul(double *a, double b) // vector * scalar
     a[0] *= b;
     a[1] *= b;
     return a;
-}*/ //Do i need this func?
-
+}*/
 
 int main(int argc, char **argv) {
     if (argc > 2){
