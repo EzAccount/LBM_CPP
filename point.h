@@ -44,8 +44,9 @@ void Point::eq() {
   double c = T;
   for (size_t k = 0; k < Q; ++k) {
     double sc = e[k] * v;
+    double q = sc / c;
     f_eq[k] = rho * w[k] *
-              (1. + 3 * sc / c + 4.5 * sc * sc / c / c - v * v * 1.5 / c / c);
+              (1. + 3 * q + 4.5 * q * q - v * v * 1.5 / c / c);
   }
 }
 void Point::macro() {
@@ -85,7 +86,6 @@ Grid::Grid(std::vector<std::pair<int, int>> indata) {
   for (auto k : indata) {
     k.first -= xmin;
   }
-  xmin = 0;
   xmax -= xmin;
   result = std::minmax_element(
       indata.begin(), indata.end(),
@@ -97,14 +97,13 @@ Grid::Grid(std::vector<std::pair<int, int>> indata) {
   for (auto k : indata) {
     k.second -= ymin;
   }
-  ymin = 0;
   ymax -= ymin;
   int flag = 0;
   grid.resize(xmax + 1);
   for (int i = 0; i < grid.size(); ++i)
     grid[i].resize(ymax + 1);
   for (int i = 0; i < grid.size(); ++i) {
-    for (int j = 0; j < grid[0].size(); ++j) {
+    for (int j = 0; j < grid[i].size(); ++j) {
       for (int k = 0; k < indata.size(); ++k) {
         if (i == indata[k].first && j == indata[k].second) {
           grid[i][j].exist = 1;
@@ -124,18 +123,20 @@ void Grid::transfer(int x, int y) {
   for (size_t k = 0; k < Q; ++k) {
     int k_temp = 0;
     int x_cord = e[k].x, y_cord = e[k].y;
-    bool flag = false; //this flag is responsible for changing the direction of move
+    int xOffset = x + e[k].x, yOffset = y + e[k].y;
+    bool flag =
+        false; // this flag is responsible for changing the direction of move
     if (grid[x][y].exist) {
-      if (grid[x + e[k].x][y + e[k].y].bound) {
-        if (grid[x + e[k].x][y].bound) {
+      if (grid[xOffset][yOffset].bound) {
+        if (grid[xOffset][y].bound) {
           x_cord = -e[k].x;
           flag = true;
         }
-        if (grid[x][y + e[k].y].bound) {
+        if (grid[x][yOffset].bound) {
           y_cord = -e[k].y;
           flag = true;
         }
-        if(!flag) {
+        if (!flag) {
           x_cord = -e[k].x;
           y_cord = -e[k].y;
           flag = true;
@@ -147,18 +148,19 @@ void Grid::transfer(int x, int y) {
           break;
         }
       }
-      if(flag) {
-        grid[x + e[k].x + e[k_temp].x][y + e[k].y + e[k_temp].y].f_temp[k_temp] =
-            alpha * grid[x][y].f[k] +
-              (1 - alpha) *
-                (grid[x + e[k].x + e[k_temp].x][y + e[k].y + e[k_temp].y].f_eq[k_temp] -
-                   grid[x][y].f_eq[k_temp])/2;
-      } else {
-        grid[x + e[k].x][y + e[k].y].f_temp[k] =
+      if (flag) {
+        grid[xOffset + e[k_temp].x][yOffset + e[k_temp].y].f_temp[k_temp] =
             alpha * grid[x][y].f[k] +
             (1 - alpha) *
-            (grid[x + e[k].x][y + e[k].y].f_eq[k] -
-             grid[x][y].f_eq[k])/2;
+                (grid[xOffset + e[k_temp].x][yOffset + e[k_temp].y]
+                     .f_eq[k_temp] -
+                 grid[x][y].f_eq[k_temp]) /
+                2;
+      } else {
+        grid[xOffset][yOffset].f_temp[k] =
+            alpha * grid[x][y].f[k] +
+            (1 - alpha) *
+                (grid[xOffset][yOffset].f_eq[k] - grid[x][y].f_eq[k]) / 2;
       }
     }
   }
@@ -169,11 +171,11 @@ void Grid::transfer(int x, int y) {
 void Grid::boundaries() {
   int count = 0;
   for (size_t i = 0; i < grid.size(); ++i) {
-    for (size_t j = 0; j < grid[0].size(); ++j) {
+    for (size_t j = 0; j < grid[i].size(); ++j) {
       if (grid[i][j].exist) {
         for (int a = -1; a <= 1; ++a) {
           for (int b = -1; b <= 1; ++b) {
-            if (i + a < grid.size() && j + b < grid[0].size() && i + a >= 0 &&
+            if (i + a < grid.size() && j + b < grid[i].size() && i + a >= 0 &&
                 i + b >= 0) {
               count += grid[i + a][j + b].exist;
               /*counter in all directions. if at least in 1 direction
