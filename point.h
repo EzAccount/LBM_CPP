@@ -151,7 +151,7 @@ void Grid::transfer(int x, int y) {
       if (flag) {
         grid[xOffset + e[k_temp].x][yOffset + e[k_temp].y].f_temp[k_temp] =
             alpha * grid[x][y].f[k] +
-            (1 - alpha) *
+            (1. - alpha) *
                 (grid[xOffset + e[k_temp].x][yOffset + e[k_temp].y]
                      .f_eq[k_temp] -
                  grid[x][y].f_eq[k_temp]) /
@@ -159,7 +159,7 @@ void Grid::transfer(int x, int y) {
       } else {
         grid[xOffset][yOffset].f_temp[k] =
             alpha * grid[x][y].f[k] +
-            (1 - alpha) *
+            (1. - alpha) *
                 (grid[xOffset][yOffset].f_eq[k] - grid[x][y].f_eq[k]) / 2;
       }
     }
