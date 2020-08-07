@@ -108,10 +108,10 @@ void Grid::transfer(int x, int y) {
   for (size_t k = 0; k < Q; ++k) {
     if (grid[x][y].bound) {
       if (grid[x + e[k].x][y].bound && !grid[x][y + e[k].y].bound) {
-        e[k].y = -e[k].y;
+        e[k].y = -e[k].y; // Do not change e[k]!
       }
       if (!grid[x + e[k].x][y].bound && grid[x][y + e[k].y].bound) {
-        e[k].x = -e[k].x;
+        e[k].x = -e[k].x; // Same
       }
     }
     if (grid[x][y].exist) {
@@ -120,7 +120,7 @@ void Grid::transfer(int x, int y) {
   }
 }
 /***
- * this func will find points on the bound
+ * this function finds points on the boundary
  */
 void Grid::boundaries() {
   int count = 0;
