@@ -48,4 +48,5 @@ std::array<double, Q> w = {4. / 9,  1. / 9,  1. / 9,  1. / 9, 1. / 9,
                            1. / 36, 1. / 36, 1. / 36, 1. / 36};
 size_t x_size, y_size;
 size_t alpha = 0;
+size_t balance = 1;
 #endif // LBM_CPP_CONSTANTS_H

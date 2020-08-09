@@ -45,8 +45,7 @@ void Point::eq() {
   for (size_t k = 0; k < Q; ++k) {
     double sc = e[k] * v;
     double q = sc / c;
-    f_eq[k] = rho * w[k] *
-              (1. + 3 * q + 4.5 * q * q - v * v * 1.5 / c / c);
+    f_eq[k] = rho * w[k] * (1. + 3 * q + 4.5 * q * q - v * v * 1.5 / c / c);
   }
 }
 void Point::macro() {
@@ -124,22 +123,25 @@ void Grid::transfer(int x, int y) {
     int k_temp = 0;
     int x_cord = e[k].x, y_cord = e[k].y;
     int xOffset = x + e[k].x, yOffset = y + e[k].y;
-    bool flag =
-        false; // this flag is responsible for changing the direction of move
+    bool flag1 = false, flag2 = false;
     if (grid[x][y].exist) {
       if (grid[xOffset][yOffset].bound) {
-        if (grid[xOffset][y].bound) {
-          x_cord = -e[k].x;
-          flag = true;
+        flag2 = true;
+        if (grid[xOffset][y].bound && grid[x][yOffset].exist) {
+          if (grid[x][yOffset + e[k].y].exist) {
+            x_cord = -e[k].x;
+            flag1 = true;
+          }
         }
-        if (grid[x][yOffset].bound) {
-          y_cord = -e[k].y;
-          flag = true;
+        if (grid[x][yOffset].bound && grid[xOffset][y].exist) {
+          if (!grid[xOffset + e[k].x][y].bound) {
+            y_cord = -e[k].y;
+            flag1 = true;
+          }
         }
-        if (!flag) {
+        if (!flag1) {
           x_cord = -e[k].x;
           y_cord = -e[k].y;
-          flag = true;
         }
       }
       for (size_t j = 0; j < Q; ++j) {
@@ -148,19 +150,30 @@ void Grid::transfer(int x, int y) {
           break;
         }
       }
-      if (flag) {
-        grid[xOffset + e[k_temp].x][yOffset + e[k_temp].y].f_temp[k_temp] =
-            alpha * grid[x][y].f[k] +
-            (1 - alpha) *
-                (grid[xOffset + e[k_temp].x][yOffset + e[k_temp].y]
-                     .f_eq[k_temp] -
-                 grid[x][y].f_eq[k_temp]) /
-                2;
-      } else {
-        grid[xOffset][yOffset].f_temp[k] =
-            alpha * grid[x][y].f[k] +
-            (1 - alpha) *
-                (grid[xOffset][yOffset].f_eq[k] - grid[x][y].f_eq[k]) / 2;
+      if (flag2) {                                              // push-off move
+        if (e[k_temp].x == -e[k].x && e[k_temp].y == -e[k].y) { // going back
+          grid[x][y].f_temp[k_temp] =
+              alpha * grid[x][y].f[k] +
+              (1 - alpha) * balance * (grid[xOffset][yOffset].f_eq[k_temp]);
+        } else {                        // displacement
+          if (e[k].x == -e[k_temp].x) { // displacement by y
+            grid[xOffset + e[k_temp].x][yOffset + e[k_temp].y].f_temp[k_temp] =
+                alpha * grid[x][y].f[k] +
+                (1 - alpha) * balance *
+                    (grid[xOffset][yOffset + e[k_temp].y].f_eq[k_temp] -
+                     grid[xOffset][y].f_eq[k_temp]) /
+                    2;
+          } else { // displacement by x
+            grid[xOffset + e[k_temp].x][yOffset + e[k_temp].y].f_temp[k_temp] =
+                alpha * grid[x][y].f[k] +
+                (1 - alpha) * balance *
+                    (grid[xOffset + e[k_temp].x][y].f_eq[k_temp] -
+                     grid[x][y].f_eq[k_temp]) /
+                    2;
+          }
+        }
+      } else { // simple move
+        grid[xOffset][yOffset].f_temp[k] = grid[x][y].f[k];
       }
     }
   }
@@ -188,6 +201,13 @@ void Grid::boundaries() {
         count = 0;
       } else
         grid[i][j].bound = 0;
+    }
+  }
+  for (int i = 0; i < grid.size(); ++i) {
+    for (int j = 0; j < grid[0].size(); ++j) {
+      if (grid[i][j].bound) {
+        grid[i][j].exist = 0;
+      }
     }
   }
 }
