@@ -42,11 +42,11 @@ template <typename T> struct Vector {
 constexpr std::size_t Q = 9;
 double Pr = 2. / 3;
 double Kn = 0.08;
-size_t iterations = 1000;
+size_t iterations = 1;
 std::array<Vector<double>, Q> e;
 std::array<double, Q> w = {4. / 9,  1. / 9,  1. / 9,  1. / 9, 1. / 9,
                            1. / 36, 1. / 36, 1. / 36, 1. / 36};
 size_t x_size, y_size;
-size_t alpha = 0;
-size_t balance = 1;
+constexpr std::size_t alpha = 1;
+constexpr std::size_t balance = 1;
 #endif // LBM_CPP_CONSTANTS_H

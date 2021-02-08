@@ -2,7 +2,7 @@
 // Created by thear on 03.04.2020.
 //
 
-#include "../point.h"
+/*#include "../point.h"
 #include <iostream>
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
@@ -87,4 +87,4 @@ TEST(GridTransfer__Test, Transfer_Test) {
   A.grid[5][4].f_eq[8] = 5;
   A.transfer(6, 3);
   EXPECT_EQ(A.grid[6][3].f_temp[8], 5); // convex corner
-}
+}*/
