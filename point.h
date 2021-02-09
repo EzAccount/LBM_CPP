@@ -185,15 +185,9 @@ void Grid::transfer(int x, int y) {
         }
       } else { // simple move
         grid[xOffset][yOffset].f_temp[k] = grid[x][y].f[k];
-    if (grid[x][y].bound) {
-      if (grid[x + e[k].x][y].bound && !grid[x][y + e[k].y].bound) {
-        e[k].y = -e[k].y; // Do not change e[k]!
-      }
-      if (!grid[x + e[k].x][y].bound && grid[x][y + e[k].y].bound) {
-        e[k].x = -e[k].x; // Same
 
-      }
     }
+  }
   }
 }
 /***
