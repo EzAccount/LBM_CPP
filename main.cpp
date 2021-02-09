@@ -1,6 +1,7 @@
 #include "point.h"
 #include <iostream>
 #include <fstream>
+
 // typedef Point point;
 
 /*double scalar(double *a, double *b) // dot product in R^2

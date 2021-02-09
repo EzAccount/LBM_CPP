@@ -42,7 +42,7 @@ template <typename T> struct Vector {
 constexpr std::size_t Q = 9;
 double Pr = 2. / 3;
 double Kn = 0.08;
-size_t iterations = 1;
+size_t iterations = 10;
 std::array<Vector<double>, Q> e;
 std::array<double, Q> w = {4. / 9,  1. / 9,  1. / 9,  1. / 9, 1. / 9,
                            1. / 36, 1. / 36, 1. / 36, 1. / 36};
