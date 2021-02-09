@@ -89,12 +89,12 @@ int main() { // int argc, char **argv
     }
   }
 
-  std::ofstream out1;
-  out1.open("D:\\LBM_CPP\\Test_rho.txt");
-  if (out1.is_open()) {
+  std::ofstream out;
+  out.open("results.dat");
+  if (out.is_open()) {
     for (int i = 0; i <= 100; ++i) {
       for (int j = 0; j <= 10; ++j) {
-        out1 << i << " " << j << " " << Puas.grid[i][j].rho << std::endl;
+        out << i << " " << j << " " << Puas.grid[i][j].rho << std::endl;
       }
     }
     /*
