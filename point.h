@@ -126,6 +126,7 @@ Grid::Grid(std::vector<std::pair<int, int>> indata) {
 
 void Grid::transfer(int x, int y) {
   for (size_t k = 0; k < Q; ++k) {
+<<<<<<< HEAD
     int k_temp = 0;
     int x_cord = e[k].x, y_cord = e[k].y;
     int xOffset = x + e[k].x, yOffset = y + e[k].y;
@@ -185,12 +186,20 @@ void Grid::transfer(int x, int y) {
         }
       } else { // simple move
         grid[xOffset][yOffset].f_temp[k] = grid[x][y].f[k];
+=======
+    if (grid[x][y].bound) {
+      if (grid[x + e[k].x][y].bound && !grid[x][y + e[k].y].bound) {
+        e[k].y = -e[k].y; // Do not change e[k]!
+      }
+      if (!grid[x + e[k].x][y].bound && grid[x][y + e[k].y].bound) {
+        e[k].x = -e[k].x; // Same
+>>>>>>> master
       }
     }
   }
 }
 /***
- * this func will find points on the bound
+ * this function finds points on the boundary
  */
 void Grid::boundaries() {
   int count = 0;
