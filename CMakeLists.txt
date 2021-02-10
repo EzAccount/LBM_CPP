@@ -15,5 +15,6 @@ set(ENV{ASAN_OPTIONS} "strict_string_checks=1:detect_stack_use_after_return=1:ch
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${ASAN_FLAGS}")
 
+enable_testing()
 add_executable(LBM_CPP main.cpp point.h constants.h)
 add_subdirectory(tests)
