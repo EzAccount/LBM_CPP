@@ -7,11 +7,13 @@
 #include <algorithm>
 #include <array>
 #include <iostream>
+#include <numeric>
 #include <vector>
 
 /***
- * The class remembers the macro parameters of each point taken from the input data.
- * Methods contribute to the recalculation of these parameters and the distribution.
+ * The class remembers the macro parameters of each point taken from the input
+ * data. Methods contribute to the recalculation of these parameters and the
+ * distribution.
  */
 class Point {
 public:
@@ -66,9 +68,7 @@ void Point::eq() {
  */
 void Point::macro() {
   rho = 0;
-  for (size_t k = 0; k < Q; ++k) {
-    rho += f_temp[k];
-  }
+  rho = std::accumulate(f_temp.begin(), f_temp.end(), 0.);
 
   T = 0;
   for (size_t k = 0; k < Q; ++k) {
