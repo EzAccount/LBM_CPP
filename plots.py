@@ -4,7 +4,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 fig = pyplot.figure()
 ax = Axes3D(fig)
-with open('results.dat', 'r') as results:
+with open('cmake-build-debug/results.dat', 'r') as results:
     data = np.loadtxt(results)
     x, y, rho = data.T
 
