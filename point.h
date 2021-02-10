@@ -7,16 +7,27 @@
 #include <algorithm>
 #include <array>
 #include <iostream>
+#include <numeric>
 #include <vector>
 
 /***
- * The class remembers the macro parameters of each point taken from the input data.
- * Methods contribute to the recalculation of these parameters and the distribution.
+ * The class remembers the macro parameters of each point taken from the input
+ * data. Methods contribute to the recalculation of these parameters and the
+ * distribution.
  */
 class Point {
 public:
   std::array<double, Q> f, f_temp, f_eq;
   double tau, T, rho, P;
+  /**<
+   * f - distribution function.
+   * f_temp - distribution function after one step.
+   * f_eq - equilibrium distribution function.
+   * T - temperature at point.
+   * rho - density at point.
+   * P - pressure at point.
+   * tau - relaxation time.
+   */
   bool interior = false;
   bool bound = false;
   Vector<double> v;
@@ -66,9 +77,7 @@ void Point::eq() {
  */
 void Point::macro() {
   rho = 0;
-  for (size_t k = 0; k < Q; ++k) {
-    rho += f_temp[k];
-  }
+  rho = std::accumulate(f_temp.begin(), f_temp.end(), 0.);
 
   T = 0;
   for (size_t k = 0; k < Q; ++k) {
@@ -96,7 +105,7 @@ Point::Point(double rho1, double T1, Vector<double> v1, double P1) { // TODO: in
   P = P1;
   tau = 1;
   eq();
-  for (int k = 0; k < Q; ++k) {
+  for (size_t k = 0; k < Q; ++k) {
     f[k] = f_eq[k];
     f_temp[k] = f_eq[k];
   }
@@ -133,11 +142,11 @@ Grid::Grid(std::vector<std::pair<int, int>> input_data) {
   ymax -= ymin;
   int flag = 0;
   grid.resize(xmax + 1);
-  for (int i = 0; i < grid.size(); ++i)
+  for (size_t i = 0; i < grid.size(); ++i)
     grid[i].resize(ymax + 1);
-  for (int i = 0; i < grid.size(); ++i) {
-    for (int j = 0; j < grid[i].size(); ++j) {
-      for (int k = 0; k < input_data.size(); ++k) {
+  for (size_t i = 0; i < grid.size(); ++i) {
+    for (size_t j = 0; j < grid[i].size(); ++j) {
+      for (size_t k = 0; k < input_data.size(); ++k) {
         if (i == input_data[k].first && j == input_data[k].second) {
           grid[i][j].interior = 1;
           flag = 1;
@@ -165,21 +174,21 @@ void Grid::transfer(int x, int y) {
     int k_temp = 0;
     int x_cord = e[k].x, y_cord = e[k].y;
     int xOffset = x + e[k].x, yOffset = y + e[k].y;
-    bool flag1 = false, flag2 = false;
+    bool change_coordinate = false, move_belongs_to_boundary = false;
     if (grid[x][y].interior) {
       if (grid[x + e[k].x][y + e[k].y].bound) {
-        flag2 = true;
+        move_belongs_to_boundary = true;
         if (grid[x + e[k].x][y].bound && grid[x][y + e[k].y].interior) {
           x_cord = -e[k].x;
           xOffset = x;
-          flag1 = true;
+          change_coordinate = true;
         }
         if (grid[x][y + e[k].y].bound && grid[x + e[k].x][y].interior) {
           y_cord = -e[k].y;
           yOffset = y;
-          flag1 = true;
+          change_coordinate = true;
         }
-        if (!flag1) {
+        if (!change_coordinate) {
           x_cord = -e[k].x;
           y_cord = -e[k].y;
           xOffset = x;
@@ -192,31 +201,21 @@ void Grid::transfer(int x, int y) {
           break;
         }
       }
-      if (flag2) {                                              // push-off move
+      if (move_belongs_to_boundary) {                                              // push-off move
         if (e[k_temp].x == -e[k].x && e[k_temp].y == -e[k].y) { // going back
-          grid[xOffset][yOffset].f_temp[k_temp] =
-              alpha * grid[x][y].f[k] +
-              (1 - alpha) * balance *
-                  (grid[x + e[k].x][y + e[k].y].f_eq[k_temp]);
+          grid[xOffset][yOffset].f_temp[k_temp] = (grid[x][y].f[k] + balance *
+                  (grid[x + e[k].x][y + e[k].y].f_eq[k_temp])) / 2;
         } else {                        // displacement
           if (e[k].x == -e[k_temp].x) { // displacement by y
             grid[xOffset][yOffset].f_temp[k_temp] =
-                alpha * grid[x][y].f[k] +
-                (1 - alpha) * balance *
+                grid[x][y].f[k] + balance *
                     (grid[x + e[k].x][y + e[k].y].f_eq[k_temp] -
                      grid[x + e[k].x][y].f_eq[k_temp]) / 2;
-            if (grid[xOffset][yOffset].f_temp[k_temp] < 0) {
-              grid[xOffset][yOffset].f_temp[k_temp] = 0;
-            }
           } else { // displacement by x
             grid[xOffset][yOffset].f_temp[k_temp] =
-                alpha * grid[x][y].f[k] +
-                (1 - alpha) * balance *
+                grid[x][y].f[k] + balance *
                     (grid[x + e[k].x][y + e[k].y].f_eq[k_temp] -
                      grid[x][y + e[k].y].f_eq[k_temp]) / 2;
-            if (grid[xOffset][yOffset].f_temp[k_temp] < 0) {
-              grid[xOffset][yOffset].f_temp[k_temp] = 0;
-            }
           }
         }
       } else { // simple move
@@ -238,8 +237,7 @@ void Grid::boundaries() {
       if (grid[i][j].interior) {
         for (int a = -1; a <= 1; ++a) {
           for (int b = -1; b <= 1; ++b) {
-            if (i + a < grid.size() && j + b < grid[i].size() && i + a >= 0 &&
-                i + b >= 0) {
+            if (i + a < grid.size() && j + b < grid[i].size()) {
               count += grid[i + a][j + b].interior;
             }
           }
@@ -250,8 +248,8 @@ void Grid::boundaries() {
         grid[i][j].bound = 0;
     }
   }
-  for (int i = 0; i < grid.size(); ++i) {
-    for (int j = 0; j < grid[0].size(); ++j) {
+  for (size_t i = 0; i < grid.size(); ++i) {
+    for (size_t j = 0; j < grid[0].size(); ++j) {
       if (grid[i][j].bound) {
         grid[i][j].interior = 0;
       }
