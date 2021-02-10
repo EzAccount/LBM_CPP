@@ -52,6 +52,7 @@ std::array<Vector<double>, Q> e = {{{0, 0},
                                     {-1, 1},
                                     {-1, -1},
                                     {1, -1}}};
+
 std::array<double, Q> w = {4. / 9,  1. / 9,  1. / 9,  1. / 9, 1. / 9,
                            1. / 36, 1. / 36, 1. / 36, 1. / 36};
 size_t x_size, y_size;
