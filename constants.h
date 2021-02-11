@@ -55,7 +55,12 @@ std::array<Vector<double>, Q> e = {{{0, 0},
 
 std::array<double, Q> w = {4. / 9,  1. / 9,  1. / 9,  1. / 9, 1. / 9,
                            1. / 36, 1. / 36, 1. / 36, 1. / 36};
-size_t x_size, y_size;
 constexpr std::size_t alpha = 0;
 constexpr std::size_t balance = 1;
+/**<
+ * Q - number of grid directions.
+ * e - vector of all directions.
+ * w - array containing the Maxwell distribution coefficients for each direction.
+ * balance - balancing factor for boundary conditions.
+ */
 #endif // LBM_CPP_CONSTANTS_H

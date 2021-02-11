@@ -24,10 +24,8 @@ int main() {
   }
   for (int i = 0; i <= 100; ++i) {
     for (int j = 0; j <= 10; ++j) {
-      for (size_t k = 0; k < Q; ++k) {
-        Pois.grid[i][j].f[k] = Pois.grid[i][j].f_eq[k];
-        Pois.grid[i][j].f_temp[k] = Pois.grid[i][j].f_eq[k];
-      }
+      Pois.grid[i][j].f = Pois.grid[i][j].f_eq;
+      Pois.grid[i][j].f_temp = Pois.grid[i][j].f_eq;
     }
   }
   for (size_t t = 0; t < iterations; ++t) {

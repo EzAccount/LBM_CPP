@@ -19,6 +19,15 @@ class Point {
 public:
   std::array<double, Q> f, f_temp, f_eq;
   double tau, T, rho, P;
+  /**<
+   * f - distribution function.
+   * f_temp - distribution function after one step.
+   * f_eq - equilibrium distribution function.
+   * T - temperature at point.
+   * rho - density at point.
+   * P - pressure at point.
+   * tau - relaxation time.
+   */
   bool interior = false;
   bool bound = false;
   Vector<double> v;
@@ -165,21 +174,21 @@ void Grid::transfer(int x, int y) {
     int k_temp = 0;
     int x_cord = e[k].x, y_cord = e[k].y;
     int xOffset = x + e[k].x, yOffset = y + e[k].y;
-    bool flag1 = false, flag2 = false;
+    bool change_coordinate = false, move_belongs_to_boundary = false;
     if (grid[x][y].interior) {
       if (grid[x + e[k].x][y + e[k].y].bound) {
-        flag2 = true;
+        move_belongs_to_boundary = true;
         if (grid[x + e[k].x][y].bound && grid[x][y + e[k].y].interior) {
           x_cord = -e[k].x;
           xOffset = x;
-          flag1 = true;
+          change_coordinate = true;
         }
         if (grid[x][y + e[k].y].bound && grid[x + e[k].x][y].interior) {
           y_cord = -e[k].y;
           yOffset = y;
-          flag1 = true;
+          change_coordinate = true;
         }
-        if (!flag1) {
+        if (!change_coordinate) {
           x_cord = -e[k].x;
           y_cord = -e[k].y;
           xOffset = x;
@@ -192,7 +201,7 @@ void Grid::transfer(int x, int y) {
           break;
         }
       }
-      if (flag2) {                                              // push-off move
+      if (move_belongs_to_boundary) {                                              // push-off move
         if (e[k_temp].x == -e[k].x && e[k_temp].y == -e[k].y) { // going back
           grid[xOffset][yOffset].f_temp[k_temp] = (grid[x][y].f[k] + balance *
                   (grid[x + e[k].x][y + e[k].y].f_eq[k_temp])) / 2;
