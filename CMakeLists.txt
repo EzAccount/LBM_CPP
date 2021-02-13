@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -g -pg -fno-omit-
 set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -DDEBUG") #-pg
-#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wshadow -Wstrict-aliasing -Weffc++")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wshadow -Wstrict-aliasing -Weffc++")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-inline")
 
 #ASan
@@ -16,5 +16,5 @@ set(ENV{ASAN_OPTIONS} "strict_string_checks=1:detect_stack_use_after_return=1:ch
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${ASAN_FLAGS}")
 
 enable_testing()
-add_executable(LBM_CPP main.cpp point.h constants.h)
+add_executable(LBM_CPP main.cpp point.h constants.h utils.h vector_2d.h)
 add_subdirectory(tests)

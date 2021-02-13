@@ -23,7 +23,7 @@ Grid poiseuille_flow_initialization(std::vector<std::pair<int, int>> input_data)
     for (int i = 0; i < poiseuille.grid.size(); ++i) {
       poiseuille.grid[i][j].rho = 1.;
       poiseuille.grid[i][j].T = 1.;
-      poiseuille.grid[i][j].v = {0, 0};
+      poiseuille.grid[i][j].v = Vector2D<double>(0.,0.);
       poiseuille.grid[i][j].eq();
     }
     poiseuille.grid[poiseuille.grid.size()-1][j].rho = 1.2;
