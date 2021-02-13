@@ -1,7 +1,7 @@
 #include "point.h"
 #include <iostream>
 #include <fstream>
-
+#include "utils.h"
 
 int main() {
   std::vector<std::pair<int, int>> input_data;
@@ -16,7 +16,7 @@ int main() {
     for (int i = 0; i <= 100; ++i) {
       Pois.grid[i][j].rho = 1.;
       Pois.grid[i][j].T = 1.;
-      Pois.grid[i][j].v = {0, 0};
+      Pois.grid[i][j].v = Vector2D<double>{0, 0};
       Pois.grid[i][j].eq();
     }
     Pois.grid[100][j].rho = 1.2;

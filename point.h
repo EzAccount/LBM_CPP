@@ -30,11 +30,11 @@ public:
    */
   bool interior = false;
   bool bound = false;
-  Vector<double> v;
+  Vector2D<double> v;
   void eq();
   void col();
   void macro();
-  explicit Point(double = 0., double = 0., Vector<double> = 0., double = 0.);
+  explicit Point(double = 0., double = 0., Vector2D<double> = Vector2D<double>(0.,0.), double = 0.);
 };
 
 /***
@@ -44,7 +44,7 @@ public:
  */
 class Grid {
 public:
-  Grid(std::vector<std::pair<int, int>>);
+  explicit Grid(std::vector<std::pair<int, int>>);
   void boundaries();
   void transfer(int, int);
   std::array<double, 5> macro_at(size_t, size_t); // TODO: result output
@@ -98,7 +98,7 @@ void Point::macro() {
  * @param v1 - Input v
  * @param P1 - Input P
  */
-Point::Point(double rho1, double T1, Vector<double> v1, double P1) { // TODO: initialization list
+Point::Point(double rho1, double T1, Vector2D<double> v1, double P1) { // TODO: initialization list
   rho = rho1;
   T = T1;
   v = v1;
@@ -117,7 +117,7 @@ Point::Point(double rho1, double T1, Vector<double> v1, double P1) { // TODO: in
  * @param input_data
  */
 Grid::Grid(std::vector<std::pair<int, int>> input_data) {
-  int xmax, ymax, xmin, ymin;
+  int xmax, ymax, xmin, ymin; //TODO: should those be size_t?
   auto result = std::minmax_element(
       input_data.begin(), input_data.end(),
       [&](const std::pair<int, int> &a, const std::pair<int, int> &b) {
@@ -142,19 +142,19 @@ Grid::Grid(std::vector<std::pair<int, int>> input_data) {
   ymax -= ymin;
   int flag = 0;
   grid.resize(xmax + 1);
-  for (size_t i = 0; i < grid.size(); ++i)
-    grid[i].resize(ymax + 1);
+  for (auto &grid_row: grid)
+    grid_row.resize(ymax + 1);
   for (size_t i = 0; i < grid.size(); ++i) {
     for (size_t j = 0; j < grid[i].size(); ++j) {
-      for (size_t k = 0; k < input_data.size(); ++k) {
-        if (i == input_data[k].first && j == input_data[k].second) {
-          grid[i][j].interior = 1;
+      for (auto &input_cell : input_data) {
+        if (i == input_cell.first && j == input_cell.second) {
+          grid[i][j].interior = true;
           flag = 1;
           break;
         }
       }
       if (flag == 0) {
-        grid[i][j].interior = 0;
+        grid[i][j].interior = false;
       } else
         flag = 0;
     }
@@ -172,6 +172,7 @@ Grid::Grid(std::vector<std::pair<int, int>> input_data) {
 void Grid::transfer(int x, int y) {
   for (size_t k = 0; k < Q; ++k) {
     int k_temp = 0;
+    //TODO why those are int but e is double?
     int x_cord = e[k].x, y_cord = e[k].y;
     int xOffset = x + e[k].x, yOffset = y + e[k].y;
     bool change_coordinate = false, move_belongs_to_boundary = false;
@@ -245,16 +246,20 @@ void Grid::boundaries() {
         grid[i][j].bound = count < 9;
         count = 0;
       } else
-        grid[i][j].bound = 0;
+        grid[i][j].bound = false;
     }
   }
-  for (size_t i = 0; i < grid.size(); ++i) {
-    for (size_t j = 0; j < grid[0].size(); ++j) {
-      if (grid[i][j].bound) {
-        grid[i][j].interior = 0;
+  for (auto &row : grid) {
+    for (auto &item : row) {
+      if (item.bound) {
+        item.interior = false;
       }
     }
   }
+}
+
+std::array<double, 5> Grid::macro_at(size_t, size_t) {
+  return std::array<double, 5>();
 }
 
 #endif // LBM_CPP_POINT_H
