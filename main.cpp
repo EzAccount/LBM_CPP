@@ -1,7 +1,7 @@
 #include "point.h"
-#include <iostream>
-#include <fstream>
 #include "utils.h"
+#include <fstream>
+#include <iostream>
 
 int main() {
   std::vector<std::pair<int, int>> input_data;
@@ -43,7 +43,8 @@ int main() {
   if (out.is_open()) {
     for (int i = 0; i <= 100; ++i) {
       for (int j = 0; j <= 10; ++j) {
-        out << i << " " << j << " " << Pois.grid[i][j].f << " " << Pois.grid[i][j].T << " " << Pois.grid[i][j].rho << std::endl;
+        out << i << " " << j << " " << Pois.grid[i][j].f << " "
+            << Pois.grid[i][j].T << " " << Pois.grid[i][j].rho << std::endl;
       }
     }
   }

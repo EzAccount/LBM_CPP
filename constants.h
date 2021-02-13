@@ -13,7 +13,8 @@
 /**<
  * Q - number of grid directions.
  * e - vector of all directions.
- * w - array containing the Maxwell distribution coefficients for each direction.
+ * w - array containing the Maxwell distribution coefficients for each
+ * direction.
  * balance - balancing factor for boundary conditions.
  */
 constexpr std::size_t Q = 9;
