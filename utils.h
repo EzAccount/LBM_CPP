@@ -5,6 +5,7 @@
 #ifndef LBM_CPP_UTILS_H
 #define LBM_CPP_UTILS_H
 
+#include <iterator>
 
 template <class T, std::size_t N>
 std::ostream& operator<<(std::ostream& o, const std::array<T, N>& arr)
