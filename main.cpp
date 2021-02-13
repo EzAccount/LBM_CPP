@@ -43,7 +43,7 @@ int main() {
   if (out.is_open()) {
     for (int i = 0; i <= 100; ++i) {
       for (int j = 0; j <= 10; ++j) {
-        out << i << " " << j << " " << Pois.grid[i][j].rho << std::endl;
+        out << i << " " << j << " " << Pois.grid[i][j].f << " " << Pois.grid[i][j].T << " " << Pois.grid[i][j].rho << std::endl;
       }
     }
   }

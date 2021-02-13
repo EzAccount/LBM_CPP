@@ -209,12 +209,12 @@ void Grid::transfer(int x, int y) {
           if (e[k].x == -e[k_temp].x) { // displacement by y
             grid[xOffset][yOffset].f_temp[k_temp] =
                 grid[x][y].f[k] + balance *
-                    (grid[x + e[k].x][y + e[k].y].f_eq[k_temp] -
+                    (grid[x + e[k].x][y + e[k].y].f_eq[k_temp] +
                      grid[x + e[k].x][y].f_eq[k_temp]) / 2;
           } else { // displacement by x
             grid[xOffset][yOffset].f_temp[k_temp] =
                 grid[x][y].f[k] + balance *
-                    (grid[x + e[k].x][y + e[k].y].f_eq[k_temp] -
+                    (grid[x + e[k].x][y + e[k].y].f_eq[k_temp] +
                      grid[x][y + e[k].y].f_eq[k_temp]) / 2;
           }
         }
