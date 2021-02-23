@@ -3,8 +3,8 @@
 //
 
 #include "../point.h"
-#include <iostream>
 #include <gtest/gtest.h>
+#include <iostream>
 
 std::vector<std::pair<int, int>> initialization() {
   std::vector<std::pair<int, int>> input_data;
@@ -16,22 +16,23 @@ std::vector<std::pair<int, int>> initialization() {
   return input_data;
 }
 
-Grid poiseuille_flow_initialization(std::vector<std::pair<int, int>> input_data) {
+Grid poiseuille_flow_initialization(
+    std::vector<std::pair<int, int>> input_data) {
   Grid poiseuille(input_data);
   poiseuille.boundaries();
-  for (int j = 0; j < poiseuille.grid[0].size(); ++j) {
-    for (int i = 0; i < poiseuille.grid.size(); ++i) {
+  for (size_t j = 0; j < poiseuille.grid[0].size(); ++j) {
+    for (size_t i = 0; i < poiseuille.grid.size(); ++i) {
       poiseuille.grid[i][j].rho = 1.;
       poiseuille.grid[i][j].T = 1.;
-      poiseuille.grid[i][j].v = Vector2D<double>(0.,0.);
+      poiseuille.grid[i][j].v = Vector2D<double>(0., 0.);
       poiseuille.grid[i][j].eq();
     }
-    poiseuille.grid[poiseuille.grid.size()-1][j].rho = 1.2;
-    poiseuille.grid[poiseuille.grid.size()-1][j].eq();
+    poiseuille.grid[poiseuille.grid.size() - 1][j].rho = 1.2;
+    poiseuille.grid[poiseuille.grid.size() - 1][j].eq();
   }
-  for (int i = 0; i < poiseuille.grid.size(); ++i) {
-    for (int j = 0; j < poiseuille.grid[0].size(); ++j) {
-      for (int k = 0; k < Q; ++k) {
+  for (size_t i = 0; i < poiseuille.grid.size(); ++i) {
+    for (size_t j = 0; j < poiseuille.grid[0].size(); ++j) {
+      for (size_t k = 0; k < Q; ++k) {
         poiseuille.grid[i][j].f[k] = poiseuille.grid[i][j].f_eq[k];
         poiseuille.grid[i][j].f_temp[k] = poiseuille.grid[i][j].f_eq[k];
       }
@@ -61,7 +62,7 @@ TEST(GridEquilibrium_Test, MacroEqPoiseuille_Test) {
     }
   }
   for (size_t j = 0; j < Pois.grid[0].size(); ++j) {
-    EXPECT_EQ(Pois.grid[Pois.grid.size() - 1][j].f_eq[0], 1.2 * 4./9);
+    EXPECT_EQ(Pois.grid[Pois.grid.size() - 1][j].f_eq[0], 1.2 * 4. / 9);
   }
 }
 

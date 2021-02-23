@@ -1,7 +1,7 @@
 #include "point.h"
-#include <iostream>
-#include <fstream>
 #include "utils.h"
+#include <fstream>
+#include <iostream>
 
 int main() {
   //TODO : x_size y_size
@@ -58,9 +58,10 @@ int main() {
   std::ofstream out;
   out.open("results.dat");
   if (out.is_open()) {
-    for (int i = 0; i <= x_size; ++i) {
-      for (int j = 0; j <= y_size; ++j) {
-        out << i << " " << j << " " << Pois.grid[i][j].f << " " << Pois.grid[i][j].T << " " << Pois.grid[i][j].rho << std::endl;
+    for (int i = 0; i <= 100; ++i) {
+      for (int j = 0; j <= 10; ++j) {
+        out << i << " " << j << " " << Pois.grid[i][j].f << " "
+            << Pois.grid[i][j].T << " " << Pois.grid[i][j].rho << std::endl;
       }
     }
   }
