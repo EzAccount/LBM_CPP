@@ -47,6 +47,7 @@ public:
   explicit Grid(std::vector<std::pair<int, int>>);
   void boundaries();
   void transfer(int, int);
+  void open_boundaries(int, int, double);
   std::array<double, 5> macro_at(size_t, size_t); // TODO: result output
   std::vector<std::vector<Point>> grid;
 };
@@ -161,6 +162,11 @@ Grid::Grid(std::vector<std::pair<int, int>> input_data) {
   }
 }
 
+void Grid::open_boundaries(int x, int y, double rho){
+  grid[x][y].rho = rho;
+  grid[x][y].eq();
+}
+
 /***
  * Moving the points along the nine directions.
  * If by one component of the direction taken at a given step the point moves to the boundary,
@@ -170,7 +176,7 @@ Grid::Grid(std::vector<std::pair<int, int>> input_data) {
  * @param y - second coordinate
  */
 void Grid::transfer(int x, int y) {
-  for (size_t k = 0; k < Q; ++k) {
+  for (int k = 0; k < Q; ++k) {
     int k_temp = 0;
     //TODO why those are int but e is double?
     int x_cord = e[k].x, y_cord = e[k].y;
@@ -204,24 +210,23 @@ void Grid::transfer(int x, int y) {
       }
       if (move_belongs_to_boundary) {                                              // push-off move
         if (e[k_temp].x == -e[k].x && e[k_temp].y == -e[k].y) { // going back
-          grid[xOffset][yOffset].f_temp[k_temp] = (grid[x][y].f[k] + balance *
-                  (grid[x + e[k].x][y + e[k].y].f_eq[k_temp])) / 2;
+          grid[xOffset][yOffset].f_temp[k_temp] = alpha * grid[x][y].f[k] + (1 - alpha) * balance *
+                  grid[x + e[k].x][y + e[k].y].f_eq[k_temp];
         } else {                        // displacement
-          if (e[k].x == -e[k_temp].x) { // displacement by y
+          if (e[k].x == -e[k_temp].x) { //   displacement by y
             grid[xOffset][yOffset].f_temp[k_temp] =
-                grid[x][y].f[k] + balance *
+                alpha * grid[x][y].f[k] + (1 - alpha) * balance *
                     (grid[x + e[k].x][y + e[k].y].f_eq[k_temp] +
                      grid[x + e[k].x][y].f_eq[k_temp]) / 2;
           } else { // displacement by x
             grid[xOffset][yOffset].f_temp[k_temp] =
-                grid[x][y].f[k] + balance *
+               alpha * grid[x][y].f[k] + (1 - alpha) *  balance *
                     (grid[x + e[k].x][y + e[k].y].f_eq[k_temp] +
                      grid[x][y + e[k].y].f_eq[k_temp]) / 2;
           }
         }
       } else { // simple move
-        grid[xOffset][yOffset].f_temp[k] = grid[x][y].f[k];
-
+        grid[xOffset][yOffset].f_temp[k] += grid[x][y].f[k];
     }
   }
   }
