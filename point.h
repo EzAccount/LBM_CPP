@@ -124,13 +124,13 @@ void Grid::open_bound() {
     grid[grid.size() - 1][j].eq();
 
     if (grid[grid.size() - 1][j].interior) {
-      grid[grid.size() - 1][j].f = grid[grid.size() - 1][j].f_eq;
+      grid[grid.size() - 1][j].f_temp = grid[grid.size() - 1][j].f_eq;
     } else {
       for (size_t k = 0; k < Q; k++) {
         if (grid[grid.size() - 1][j].w_for_bound_point[k] > 0) {
-          grid[grid.size() - 1][j].f[k] = grid[grid.size() - 1][j].f_eq[k];
+          grid[grid.size() - 1][j].f_temp[k] = grid[grid.size() - 1][j].f_eq[k];
         } else {
-          grid[grid.size() - 1][j].f[k] = 0.;
+          grid[grid.size() - 1][j].f_temp[k] = 0.;
         }
       }
     }

@@ -2,6 +2,7 @@
 #include "utils.h"
 #include <fstream>
 #include <iostream>
+#include "Paraview.h"
 
 int main() {
   int x_size = 100, y_size = 10;
@@ -61,6 +62,9 @@ int main() {
         Pois.grid[i][j].zeroing_temp();
       }
     }
+    if (t%100 == 0) {
+      ExportToVtk(Pois.grid, x_size+1, y_size+1, t);
+    }
   }
 
   std::ofstream out;
@@ -96,5 +100,6 @@ int main() {
     }
   }
   out1.close();
+
   return 0;
 }
