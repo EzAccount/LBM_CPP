@@ -1,7 +1,7 @@
 #ifndef PARAVIEW_H_INCLUDED
 #define PARAVIEW_H_INCLUDED
 #define SCALE 100
-#include "Point.h"
+#include "point.h"
 #include "constants.h"
 #include "utils.h"
 
