@@ -241,16 +241,20 @@ void Grid::transfer(int x, int y) {
   for (int k = 0; k < Q; ++k) {
     if (grid[x][y].f[k] > 0) {
       int x_offset = x + e[k].x, y_offset = y + e[k].y;
-      if (x_offset >= 0 && y_offset >= 0 && x_offset < grid.size() && y_offset < grid[x_offset].size() && grid[x_offset][y_offset].bound) {
-        for (int direction = 0; direction < Q; direction++) {
-          double weight = grid[x_offset][y_offset].w_for_bound_point[direction];
-          if (weight != 0) {
-            grid[x_offset][y_offset].f_temp[direction] +=
-                grid[x][y].f[k] * weight;
+      bool offset_in_bounds = x_offset >= 0 && y_offset >= 0 && x_offset < grid.size() && y_offset < grid[x_offset].size();
+      if (offset_in_bounds) {
+        if (grid[x_offset][y_offset].bound) {
+          for (int direction = 0; direction < Q; direction++) {
+            double weight =
+                grid[x_offset][y_offset].w_for_bound_point[direction];
+            if (weight != 0) {
+              grid[x_offset][y_offset].f_temp[direction] +=
+                  grid[x][y].f[k] * weight;
+            }
           }
+        } else { // simple move
+          grid[x_offset][y_offset].f_temp[k] += grid[x][y].f[k];
         }
-      } else { // simple move
-        grid[x_offset][y_offset].f_temp[k] += grid[x][y].f[k];
       }
     }
   }
@@ -296,7 +300,7 @@ void Grid::boundaries() {
           for (int b = -1; b <= 1; ++b) {
             if (i + a < grid.size() && j + b < grid[i].size() &&
                 grid[i + a][j + b].interior) {
-              size_t direction_to_change;
+              size_t direction_to_change = 0;
               for (size_t q = 0; q < Q; ++q) {
                 if (e[q].x == a && e[q].y == b) {
                   direction_to_change = q;
