@@ -1,8 +1,7 @@
-#include "point.h"
-#include "utils.h"
+#include "Paraview.h"
 #include <fstream>
 #include <iostream>
-#include "Paraview.h"
+#include <math.h>
 
 int main() {
   int x_size = 100, y_size = 10;
@@ -14,6 +13,17 @@ int main() {
   }
   Grid Pois(input_data);
   Pois.boundaries();
+  for (int j = 0; j < Pois.grid[0].size(); ++j) {
+    Pois.grid[0][j].open_bound = true;
+    Pois.grid[0][j].bound = false;
+  }
+
+  for (int j = 0; j < Pois.grid[0].size(); ++j) {
+    Pois.grid[Pois.grid.size()-1][j].bound = false;
+    Pois.grid[Pois.grid.size()-1][j].open_bound = true;
+  }
+
+  Pois.weight_calculate();
   for (int j = 0; j <= y_size; ++j) {
     for (int i = 0; i <= x_size; ++i) {
       Pois.grid[i][j].rho = 1.;
@@ -21,8 +31,8 @@ int main() {
       Pois.grid[i][j].v = Vector2D<double>{0, 0};
       Pois.grid[i][j].eq();
     }
-    Pois.grid[100][j].rho = 1;
-    Pois.grid[100][j].eq();
+    Pois.grid[Pois.grid.size()-1][j].rho = 1;
+    Pois.grid[Pois.grid.size()-1][j].eq();
   }
   for (int i = 0; i <= x_size; ++i) {
     for (int j = 0; j <= y_size; ++j) {
@@ -48,22 +58,32 @@ int main() {
         Pois.transfer(i, j);
       }
     }
-    Pois.open_bound();
+    Pois.open_boundaries();
     for (int i = 0; i <= x_size; ++i) {
       for (int j = 0; j <= y_size; ++j) {
         if (Pois.grid[i][j].interior) {
           Pois.grid[i][j].macro();
           Pois.grid[i][j].eq();
+          Pois.grid[i][j].k_rel = Pois.grid[i][j].k_rel_calculate(y_size);
           Pois.grid[i][j].col();
         }
-        if (Pois.grid[i][j].bound) {
+        if (Pois.grid[i][j].bound || Pois.grid[i][j].open_bound) {
           Pois.grid[i][j].col_for_bound();
         }
         Pois.grid[i][j].zeroing_temp();
       }
     }
-    if (t%100 == 0) {
-      ExportToVtk(Pois.grid, x_size+1, y_size+1, t);
+    if (t % 100 == 0) {
+      ExportToVtk(Pois.grid, x_size + 1, y_size + 1, t);
+    }
+    if (t % 1000 == 0) {
+      double mass_flow = 0;
+      for (int i = 0; i <= x_size; ++i) {
+        for (int j = 0; j <= y_size; ++j) {
+          mass_flow += Pois.grid[i][j].rho * Pois.grid[i][j].v.x;
+        }
+      }
+      std::cout << mass_flow/x_size << std::endl;
     }
   }
 
@@ -84,7 +104,7 @@ int main() {
   if (out1.is_open()) {
     for (int i = 0; i <= x_size; ++i) {
       for (int j = 0; j <= y_size; ++j) {
-        if (Pois.grid[i][j].bound) {
+        if (Pois.grid[i][j].open_bound) {
           out1 << i << " " << j << " " << Pois.grid[i][j].w_for_bound_point[0]
                << " " << Pois.grid[i][j].w_for_bound_point[1] << " "
                << Pois.grid[i][j].w_for_bound_point[2] << " "
