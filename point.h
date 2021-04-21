@@ -9,6 +9,7 @@
 #include <iostream>
 #include <numeric>
 #include <vector>
+#include <math.h>
 
 /***
  * The class remembers the macro parameters of each point taken from the input
