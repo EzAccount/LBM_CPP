@@ -39,7 +39,7 @@ public:
   void zeroing_temp();
   void col_for_bound();
   double k_rel_calculate(int);
-  std::vector<double> w_for_bound_point;
+  std::vector<double> w_for_bound_point; // TODO: use optional array
   explicit Point(double = 0., double = 0.,
                  Vector2D<double> = Vector2D<double>(0., 0.), double = 0.);
 };
@@ -260,7 +260,7 @@ void Grid::transfer(int x, int y) {
         if (grid[x_offset][y_offset].bound) {
           for (int direction = 0; direction < Q; direction++) {
             double weight =
-                grid[x_offset][y_offset].w_for_bound_point[direction];
+                grid[x_offset][y_offset].w_for_bound_point[direction]; // TODO: check if w_for_bound_point is not empty
             if (weight != 0) {
               grid[x_offset][y_offset].f_temp[direction] +=
                   grid[x][y].f[k] * weight;
