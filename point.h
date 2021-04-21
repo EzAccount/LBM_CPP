@@ -256,7 +256,8 @@ void Grid::transfer(int x, int y) {
       bool offset_in_bounds = x_offset >= 0 && y_offset >= 0 &&
                               x_offset < grid.size() &&
                               y_offset < grid[x_offset].size();
-      if (offset_in_bounds) {
+      bool bound_point = offset_in_bounds && grid[x_offset][y_offset].w_for_bound_point.size()>0;
+      if (bound_point) {
         if (grid[x_offset][y_offset].bound) {
           for (int direction = 0; direction < Q; direction++) {
             double weight =
