@@ -7,9 +7,9 @@
 #include <algorithm>
 #include <array>
 #include <iostream>
+#include <math.h>
 #include <numeric>
 #include <vector>
-#include <math.h>
 
 /***
  * The class remembers the macro parameters of each point taken from the input
@@ -263,7 +263,9 @@ void Grid::transfer(int x, int y) {
       bool offset_in_bounds = x_offset >= 0 && y_offset >= 0 &&
                               x_offset < grid.size() &&
                               y_offset < grid[x_offset].size();
-      if (offset_in_bounds) {
+      bool bound_point = offset_in_bounds &&
+                         grid[x_offset][y_offset].w_for_bound_point.size() > 0;
+      if (bound_point) {
         if (grid[x_offset][y_offset].bound) {
           for (int direction = 0; direction < Q; direction++) {
             double weight =
@@ -325,9 +327,8 @@ void Grid::weight_calculate() {
         grid[i][j].w_for_bound_point = {0, 0, 0, 0, 0, 0, 0, 0, 0};
         for (int a = -1; a <= 1; ++a) {
           for (int b = -1; b <= 1; ++b) {
-            bool offset =
-                i + a >= 0 && j + b >= 0 && i + a < grid.size() &&
-                j + b < grid[i + a].size();
+            bool offset = i + a >= 0 && j + b >= 0 && i + a < grid.size() &&
+                          j + b < grid[i + a].size();
             if (offset) {
               size_t direction_to_change = 0;
               for (size_t q = 0; q < Q; ++q) {
