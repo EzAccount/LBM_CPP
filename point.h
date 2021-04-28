@@ -19,7 +19,7 @@
 class Point {
 public:
   std::array<double, Q> f, f_temp, f_eq;
-  double k_rel, T, rho, P;
+  double k_rel, T, rho, P, tau;
   /**<
    * f - distribution function.
    * f_temp - distribution function after one step.
@@ -39,6 +39,7 @@ public:
   void zeroing_temp();
   void col_for_bound();
   double k_rel_calculate(int);
+  double tau_calculate(int size);
   std::vector<double> w_for_bound_point;
   explicit Point(double = 0., double = 0.,
                  Vector2D<double> = Vector2D<double>(0., 0.), double = 0.);
@@ -59,6 +60,12 @@ public:
   std::array<double, 5> macro_at(size_t, size_t); // TODO: result output
   std::vector<std::vector<Point>> grid;
 };
+
+double Point::tau_calculate(int size) {
+  double k = sqrt(3.141592653 / 6) * rho / Kn / size;
+  double tau = 1 / k + 0.5;
+  return tau;
+}
 
 double Point::k_rel_calculate(int size) {
   double k = sqrt(3.141592653 / 6) * rho / Kn / size;
@@ -160,10 +167,10 @@ void Point::macro() {
     for (size_t k = 0; k < Q; ++k) {
       v += f_temp[k] / rho * e[k];
     }
-  }
-  T = 0;
-  for (size_t k = 0; k < Q; ++k) {
-    T += (e[k] - v) * (e[k] - v) * f_temp[k];
+    T = 0;
+    for (size_t k = 0; k < Q; ++k) {
+      T += (e[k] - v) * (e[k] - v) * f_temp[k] / rho;
+    }
   }
   T *= 1.5;
 }

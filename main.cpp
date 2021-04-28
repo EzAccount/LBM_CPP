@@ -4,7 +4,7 @@
 #include <math.h>
 
 int main() {
-  int x_size = 100, y_size = 10;
+  int x_size = 300, y_size = 30;
   std::vector<std::pair<int, int>> input_data;
   for (size_t i = 0; i <= x_size; ++i) {
     for (size_t j = 0; j <= y_size; ++j) {
@@ -65,6 +65,7 @@ int main() {
           Pois.grid[i][j].macro();
           Pois.grid[i][j].eq();
           Pois.grid[i][j].k_rel = Pois.grid[i][j].k_rel_calculate(y_size);
+          Pois.grid[i][j].tau = Pois.grid[i][j].tau_calculate(y_size);
           Pois.grid[i][j].col();
         }
         if (Pois.grid[i][j].bound || Pois.grid[i][j].open_bound) {
@@ -78,12 +79,10 @@ int main() {
     }
     if (t % 1000 == 0) {
       double mass_flow = 0;
-      for (int i = 0; i <= x_size; ++i) {
-        for (int j = 0; j <= y_size; ++j) {
-          mass_flow += Pois.grid[i][j].rho * Pois.grid[i][j].v.x;
-        }
+      for (int j = 1; j < y_size; ++j) {
+      mass_flow += Pois.grid[50][j].rho * Pois.grid[50][j].v.x;
       }
-      std::cout << mass_flow/x_size << std::endl;
+      std::cout << mass_flow << std::endl;
     }
   }
 
