@@ -4,7 +4,7 @@
 #include <math.h>
 
 int main() {
-  int x_size = 300, y_size = 30;
+  int x_size = 100, y_size = 10;
   std::vector<std::pair<int, int>> input_data;
   for (size_t i = 0; i <= x_size; ++i) {
     for (size_t j = 0; j <= y_size; ++j) {
@@ -31,7 +31,7 @@ int main() {
       Pois.grid[i][j].v = Vector2D<double>{0, 0};
       Pois.grid[i][j].eq();
     }
-    Pois.grid[Pois.grid.size()-1][j].rho = 1;
+    Pois.grid[Pois.grid.size()-1][j].rho = 1.;
     Pois.grid[Pois.grid.size()-1][j].eq();
   }
   for (int i = 0; i <= x_size; ++i) {
@@ -48,7 +48,7 @@ int main() {
         }
       }
       for (size_t k = 0; k < Q; k++) {
-        Pois.grid[i][j].f_temp[k] = 0;
+        Pois.grid[i][j].f_temp[k] = 0.;
       }
     }
   }

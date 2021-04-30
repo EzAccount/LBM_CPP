@@ -263,21 +263,19 @@ void Grid::transfer(int x, int y) {
       bool offset_in_bounds = x_offset >= 0 && y_offset >= 0 &&
                               x_offset < grid.size() &&
                               y_offset < grid[x_offset].size();
-      bool bound_point = offset_in_bounds &&
-                         grid[x_offset][y_offset].w_for_bound_point.size() > 0;
-      if (bound_point) {
-        if (grid[x_offset][y_offset].bound) {
-          for (int direction = 0; direction < Q; direction++) {
-            double weight =
-                grid[x_offset][y_offset].w_for_bound_point[direction];
-            if (weight != 0) {
-              grid[x_offset][y_offset].f_temp[direction] +=
-                  grid[x][y].f[k] * weight;
-            }
+      if (offset_in_bounds) {
+          if (grid[x_offset][y_offset].bound) {
+              for (int direction = 0; direction < Q; direction++) {
+                  double weight =
+                          grid[x_offset][y_offset].w_for_bound_point[direction];
+                  if (weight != 0) {
+                      grid[x_offset][y_offset].f_temp[direction] +=
+                              grid[x][y].f[k] * weight;
+                  }
+              }
+          } else { // simple move
+              grid[x_offset][y_offset].f_temp[k] += grid[x][y].f[k];
           }
-        } else { // simple move
-          grid[x_offset][y_offset].f_temp[k] += grid[x][y].f[k];
-        }
       }
     }
   }

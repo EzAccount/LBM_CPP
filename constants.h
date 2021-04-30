@@ -33,6 +33,6 @@ std::array<double, Q> w = {4. / 9,  1. / 9,  1. / 9,  1. / 9, 1. / 9,
 constexpr std::size_t balance = 1;
 
 double Kn = 0.5;
-size_t iterations = 10000;
+size_t iterations = 1000;
 constexpr std::size_t alpha = 0;
 #endif // LBM_CPP_CONSTANTS_H
