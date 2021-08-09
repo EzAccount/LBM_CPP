@@ -1,4 +1,4 @@
-
+	
 # Created by https://www.toptal.com/developers/gitignore/api/clion+all,c++
 # Edit at https://www.toptal.com/developers/gitignore?templates=clion+all,c++
 
@@ -77,8 +77,7 @@
 # *.ipr
 
 # CMake
-cmake-build-*/
-
+cmake-build-*/**		
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
 
