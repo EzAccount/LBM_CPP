@@ -48,7 +48,7 @@ jobs:
     - name: Execute
       working-directory: ${{github.workspace}}
       shell: bash
-      run: cmake . & chmod +x LBM_CPP & ls -lap . &  exec LMB_CPP
+      run: cmake . & chmod +x LBM_CPP & exec LBM_CPP
       
     - name: Results
       uses: appleboy/telegram-action@master
