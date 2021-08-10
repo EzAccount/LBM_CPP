@@ -4,7 +4,7 @@
 #include <math.h>
 
 int main() {
-  int x_size = 100, y_size = 10;
+  int x_size = 200, y_size = 20;
   std::vector<std::pair<int, int>> input_data;
   for (size_t i = 0; i <= x_size; ++i) {
     for (size_t j = 0; j <= y_size; ++j) {
