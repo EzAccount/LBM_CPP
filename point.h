@@ -68,11 +68,14 @@ double Point::tau_calculate(int size) {
 }
 
 double Point::k_rel_calculate(int size) {
+  /*
   double k = sqrt(3.141592653 / 6) * rho / Kn / size;
   if (k > 1) {
     k = 1;
   }
   return k;
+  */
+  return 1./tau_calculate(int size);
 }
 
 /***
