@@ -75,7 +75,7 @@ double Point::k_rel_calculate(int size) {
   }
   return k;
   */
-  return 1./tau_calculate(int size);
+  return 1./tau_calculate(size);
 }
 
 /***
