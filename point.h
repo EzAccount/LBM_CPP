@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <array>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <numeric>
 #include <vector>
 
@@ -135,7 +135,7 @@ void Point::eq() {
  */
 void Grid::open_boundaries() {
     for (size_t j = 0; j < grid[0].size(); ++j) {
-        grid[0][j].rho = 1.1;
+        grid[0][j].rho = 1.;
         grid[0][j].T = 1.;
         grid[0][j].v = Vector2D<double>{0, 0};
         grid[0][j].eq();
@@ -344,8 +344,9 @@ void Grid::weight_calculate() {
                                 return on_grid(i_ + direction_x, j_ + direction_y) && direction_ == direction;
                             });
                     if (direction_to_change != e().end()) {
-                        grid[i][j].w_for_bound_point[direction_to_change - e().begin()] =
-                                w()[direction_to_change - e().begin()];
+                        size_t direction_to_change_idx = direction_to_change - e().begin();
+                        grid[i][j].w_for_bound_point[direction_to_change_idx] =
+                                w()[direction_to_change_idx];
                     }
                 }
                 if (grid[i][j].bound) {

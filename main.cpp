@@ -1,10 +1,10 @@
 #include "Paraview.h"
 #include <fstream>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 int main() {
-    size_t x_size = 100, y_size = 10;
+    size_t x_size = 300, y_size = 30;
     std::vector<std::pair<int, int>> input_data;
     for (size_t i = 0; i <= x_size; ++i) {
         for (size_t j = 0; j <= y_size; ++j) {
@@ -19,8 +19,8 @@ int main() {
     }
 
     for (size_t j = 0; j < Pois.grid[0].size(); ++j) {
-        Pois.grid[Pois.grid.size() - 1][j].bound = false;
         Pois.grid[Pois.grid.size() - 1][j].open_bound = true;
+        Pois.grid[Pois.grid.size() - 1][j].bound = false;
     }
 
     Pois.weight_calculate();
@@ -31,8 +31,8 @@ int main() {
             Pois.grid[i][j].v = Vector2D<double>{0, 0};
             Pois.grid[i][j].eq();
         }
-        Pois.grid[Pois.grid.size() - 1][j].rho = 1.;
-        Pois.grid[Pois.grid.size() - 1][j].eq();
+        // Pois.grid[Pois.grid.size() - 1][j].rho = 1.; TODO: should i use it?
+        // Pois.grid[Pois.grid.size() - 1][j].eq();
     }
     for (size_t i = 0; i <= x_size; ++i) {
         for (size_t j = 0; j <= y_size; ++j) {

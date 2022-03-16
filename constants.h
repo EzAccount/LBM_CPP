@@ -7,7 +7,7 @@
 #include <array>
 #include <iostream>
 #include <vector>
-#include <math.h>
+#include <cmath>
 #include "vector_2d.h"
 
 /**<
@@ -17,7 +17,7 @@
  * direction.
  * balance - balancing factor for boundary conditions.
  */
-constexpr std::size_t Q = 9;
+constexpr std::size_t Q = 17;
 std::array<Vector2D<double>, 9> e_9 = {
         Vector2D<double>(0, 0),
         Vector2D<double>(1, 0),
@@ -74,7 +74,7 @@ const auto &w() {
 
 constexpr std::size_t balance = 1;
 
-double Kn = 0.5;
-size_t iterations = 10000;
+double Kn = 0.25;
+size_t iterations = 20000;
 constexpr std::size_t alpha = 0;
 #endif // LBM_CPP_CONSTANTS_H
