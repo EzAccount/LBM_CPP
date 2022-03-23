@@ -13,4 +13,10 @@ std::ostream &operator<<(std::ostream &o, const std::array<T, N> &arr) {
   return o;
 }
 
+template <class T>
+std::ostream &operator<<(std::ostream &o, const std::vector<T> &v) {
+    std::copy(v.cbegin(), v.cend(), std::ostream_iterator<T>(o, " "));
+    return o;
+}
+
 #endif // LBM_CPP_UTILS_H

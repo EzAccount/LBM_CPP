@@ -18,6 +18,7 @@
  * balance - balancing factor for boundary conditions.
  */
 constexpr std::size_t Q = 17;
+
 std::array<Vector2D<double>, 9> e_9 = {
         Vector2D<double>(0, 0),
         Vector2D<double>(1, 0),
@@ -33,7 +34,9 @@ std::array<Vector2D<double>, 9> e_9 = {
 std::array<double, 9> w_9 = {4. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 9,
                              1. / 36, 1. / 36, 1. / 36, 1. / 36};
 
-double r = sqrt((125 + 5 * sqrt(193)) / 72);
+double r_9 = sqrt(3);
+
+double r_17 = sqrt((125 + 5 * sqrt(193)) / 72.);
 
 std::array<Vector2D<double>, 17> e_17 = {
         Vector2D<double>(0, 0), Vector2D<double>(1, 0),
@@ -72,9 +75,18 @@ const auto &w() {
     }
 }
 
+const auto &r() {
+    if constexpr (Q == 9) {
+        return r_9;
+    } else if constexpr(Q == 17) {
+        return r_17;
+    }
+}
+
+constexpr size_t D = 2;
 constexpr std::size_t balance = 1;
 
-double Kn = 0.25;
-size_t iterations = 20000;
+double Kn = 0.5;
+size_t iterations = 10000;
 constexpr std::size_t alpha = 0;
 #endif // LBM_CPP_CONSTANTS_H

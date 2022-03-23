@@ -12,6 +12,13 @@
 #include <numeric>
 #include <vector>
 
+size_t max_component_of_grid_vectors() {
+    const auto it = std::max_element(e().begin(), e().end(), [](const auto &l, const auto &r){
+        return l.x < r.x;
+    });
+    return e()[it - e().begin()].x;
+}
+
 /***
  * The class remembers the macro parameters of each point taken from the input
  * data. Methods contribute to the recalculation of these parameters and the
@@ -21,7 +28,7 @@ class Point {
 public:
     std::array<double, Q> f, f_temp, f_eq;
     double k_rel, rho, T, P, tau;
-    /**<
+    /***
      * f - distribution function.
      * f_temp - distribution function after one step.
      * f_eq - equilibrium distribution function.
@@ -29,6 +36,7 @@ public:
      * rho - density at point.
      * P - pressure at point.
      * tau - relaxation time.
+     * interior points - points inside our vessel except boundary points
      */
     bool interior = false;
     bool bound = false;
@@ -64,27 +72,26 @@ class Grid {
 public:
     explicit Grid(std::vector<std::pair<int, int>>);
 
-    void boundaries();
+    void find_boundaries();
 
-    void open_boundaries();
+    void maintain_open_boundaries();
 
-    void transfer(int, int);
+    void transfer();
 
     void weight_calculate();
 
     bool on_grid(int i, int j) const;
 
-    std::array<double, 5> macro_at(size_t, size_t); // TODO: result output
     std::vector<std::vector<Point>> grid;
 };
 
 double Point::tau_calculate(int size) {
-    double k = sqrt(3.141592653 / 6) * rho / Kn / size;
+    double k = sqrt(M_PI / 6) * rho / Kn / size;
     return 1 / k + 0.5;
 }
 
 double Point::k_rel_calculate(int size) {
-    double k = sqrt(3.141592653 / 6) * rho / Kn / size;
+    double k = sqrt(M_PI / 6) * rho / Kn / size;
     if (k > 1) {
         k = 1;
     }
@@ -122,50 +129,53 @@ void Point::zeroing_temp() {
  * Calculation of distribution in all directions.
  */
 void Point::eq() {
-    double c = T;
+    double c = sqrt(T);
     for (size_t k = 0; k < Q; ++k) {
         double sc = e()[k] * v;
         double q = sc / c / c;
-        f_eq[k] = rho * w()[k] * (1. + 3 * q + 4.5 * q * q - v * v * 1.5 / c / c);
+        f_eq[k] = rho * w()[k] * (1. + 3 * q + 4.5 * q * q - v * v * 1.5 / c / c + (T - 1) * (r() * r() * e()[k] * e()[k] - D) / 2);
     }
 }
 
 /***
  * Open bound for Poiseuille flow
  */
-void Grid::open_boundaries() {
-    for (size_t j = 0; j < grid[0].size(); ++j) {
-        grid[0][j].rho = 1.;
-        grid[0][j].T = 1.;
-        grid[0][j].v = Vector2D<double>{0, 0};
-        grid[0][j].eq();
+void Grid::maintain_open_boundaries() {
+    for (size_t i = 0; i < max_component_of_grid_vectors(); ++i) {
+        for (size_t j = 0; j < grid[0].size(); ++j) {
+            grid[i][j].rho = 1.1;
+            grid[i][j].T = 1.;
+            grid[i][j].v = Vector2D<double>{0, 0};
+            grid[i][j].eq();
 
-        if (grid[0][j].interior) {
-            grid[0][j].f_temp = grid[0][j].f_eq;
-        } else {
-            for (size_t k = 0; k < Q; k++) {
-                if (grid[0][j].w_for_bound_point[k] > 0) {
-                    grid[0][j].f_temp[k] = grid[0][j].f_eq[k];
-                } else {
-                    grid[0][j].f_temp[k] = 0.;
+            if (grid[i][j].interior) {
+                grid[i][j].f_temp = grid[i][j].f_eq;
+            } else {
+                for (size_t k = 0; k < Q; k++) {
+                    if (grid[i][j].w_for_bound_point[k] > 0) {
+                        grid[i][j].f_temp[k] = grid[i][j].f_eq[k];
+                    } else {
+                        grid[i][j].f_temp[k] = 0.;
+                    }
                 }
             }
         }
-    }
-    for (size_t j = 0; j < grid[grid.size() - 1].size(); ++j) {
-        grid[grid.size() - 1][j].rho = 1.;
-        grid[grid.size() - 1][j].T = 1.;
-        grid[grid.size() - 1][j].v = Vector2D<double>{0, 0};
-        grid[grid.size() - 1][j].eq();
 
-        if (grid[grid.size() - 1][j].interior) {
-            grid[grid.size() - 1][j].f_temp = grid[grid.size() - 1][j].f_eq;
-        } else {
-            for (size_t k = 0; k < Q; k++) {
-                if (grid[grid.size() - 1][j].w_for_bound_point[k] > 0) {
-                    grid[grid.size() - 1][j].f_temp[k] = grid[grid.size() - 1][j].f_eq[k];
-                } else {
-                    grid[grid.size() - 1][j].f_temp[k] = 0.;
+        for (size_t j = 0; j < grid[grid.size() - i - 1].size(); ++j) {
+            grid[grid.size() - i - 1][j].rho = 1.;
+            grid[grid.size() - i - 1][j].T = 1.;
+            grid[grid.size() - i - 1][j].v = Vector2D<double>{0, 0};
+            grid[grid.size() - i - 1][j].eq();
+
+            if (grid[grid.size() - i - 1][j].interior) {
+                grid[grid.size() - i - 1][j].f_temp = grid[grid.size() - i - 1][j].f_eq;
+            } else {
+                for (size_t k = 0; k < Q; k++) {
+                    if (grid[grid.size() - i - 1][j].w_for_bound_point[k] > 0) {
+                        grid[grid.size() - i - 1][j].f_temp[k] = grid[grid.size() - i - 1][j].f_eq[k];
+                    } else {
+                        grid[grid.size() - i - 1][j].f_temp[k] = 0.;
+                    }
                 }
             }
         }
@@ -188,7 +198,7 @@ void Point::macro() {
             T += (e()[k] - v) * (e()[k] - v) * f_temp[k] / rho;
         }
     }
-    T *= 1.5;
+    T *= r() * r() / D;
 }
 
 /***
@@ -215,7 +225,7 @@ Point::Point(double rho_, double T_, Vector2D<double> v_, double P_)
  * @param input_data
  */
 Grid::Grid(std::vector<std::pair<int, int>> input_data) {
-    int x_max, y_max, x_min, y_min; // TODO: should those be size_t?
+    int x_max, y_max, x_min, y_min;
     auto result = std::minmax_element(
             input_data.begin(), input_data.end(),
             [&](const std::pair<int, int> &a, const std::pair<int, int> &b) {
@@ -238,23 +248,23 @@ Grid::Grid(std::vector<std::pair<int, int>> input_data) {
         k.second -= y_min;
     }
     y_max -= y_min;
-    int flag = 0;
     grid.resize(x_max + 1);
     for (auto &grid_row: grid)
         grid_row.resize(y_max + 1);
+    bool was_interior = false;
     for (size_t i = 0; i < grid.size(); ++i) {
         for (size_t j = 0; j < grid[i].size(); ++j) {
-            for (auto &input_cell: input_data) {
+            for (const auto &input_cell: input_data) {
                 if (i == input_cell.first && j == input_cell.second) {
                     grid[i][j].interior = true;
-                    flag = 1;
+                    was_interior = true;
                     break;
                 }
             }
-            if (flag == 0) {
+            if (!was_interior) {
                 grid[i][j].interior = false;
             } else
-                flag = 0;
+                was_interior = false;
         }
     }
 }
@@ -269,9 +279,8 @@ bool Grid::on_grid(int i, int j) const {
     return !grid.empty() && i >= 0 && j >= 0 && i < grid.size() && j < grid[0].size();
 }
 
-
 /***
- * Moving the points along the nine directions.
+ * Moving the points along the Q directions.
  * If point is aimed at a boundary point on some direction, then put
  * distribution function in f_temp of boundary point for all
  * directions, multiplied by its weight. If the weight in any direction is zero,
@@ -279,20 +288,32 @@ bool Grid::on_grid(int i, int j) const {
  * @param x - first coordinate
  * @param y - second coordinate
  */
-void Grid::transfer(int x, int y) {
-    for (size_t k = 0; k < Q; ++k) {
-        if (grid[x][y].f[k] > 0) {
-            int x_offset = x + e()[k].x, y_offset = y + e()[k].y;
-            if (on_grid(x_offset, y_offset)) {
-                if (grid[x_offset][y_offset].bound) {
-                    for (size_t direction = 0; direction < Q; direction++) {
-                        double weight =
-                                grid[x_offset][y_offset].w_for_bound_point[direction];
-                        grid[x_offset][y_offset].f_temp[direction] +=
-                                grid[x][y].f[k] * weight;
+void Grid::transfer() {
+    for (size_t x = 0; x < grid.size(); ++x) {
+        for (size_t y = 0; y < grid[x].size(); ++y) {
+            for (size_t k = 0; k < Q; ++k) {
+                if (grid[x][y].f[k] > 0) {
+                    /*int distance = std::max(std::abs(e()[k].x), std::abs(e()[k].y));
+                    int x_offset = x, y_offset = y;
+                    for (int i = 1; i <= distance; ++i) {
+                         x_offset = x + e()[k].x * i / distance;
+                         y_offset = y + e()[k].y * i / distance;
+                         // std::cout << x_offset << " " << y_offset << std::endl;
+                         if (on_grid(x_offset, y_offset) && grid[x_offset][y_offset].bound) break;
+                    }*/
+                    int x_offset = x + e()[k].x, y_offset = y + e()[k].y;
+                    if (on_grid(x_offset, y_offset)) {
+                        if (grid[x_offset][y_offset].bound) {
+                            for (size_t direction = 0; direction < Q; direction++) {
+                                double weight =
+                                        grid[x_offset][y_offset].w_for_bound_point[direction];
+                                grid[x_offset][y_offset].f_temp[direction] +=
+                                        grid[x][y].f[k] * weight;
+                            }
+                        } else { // simple move
+                            grid[x_offset][y_offset].f_temp[k] += grid[x][y].f[k];
+                        }
                     }
-                } else { // simple move
-                    grid[x_offset][y_offset].f_temp[k] += grid[x][y].f[k];
                 }
             }
         }
@@ -306,12 +327,12 @@ void Grid::transfer(int x, int y) {
  * for boundary points. For these directions we recalculate the weights of the
  * distribution function.
  */
-void Grid::boundaries() {
+void Grid::find_boundaries() {
     for (size_t i = 0; i < grid.size(); ++i) {
         for (size_t j = 0; j < grid[i].size(); ++j) {
             if (grid[i][j].interior) {
                 const size_t count =
-                        std::count_if(e().begin(), e().end(), [&](const auto &direction) {
+                        std::count_if(e().begin(), e().begin() + 9, [&](const auto &direction) {
                             int direction_x = direction.x, direction_y = direction.y, i_ = i, j_ = j;
                             return on_grid(i_ + direction_x, j_ + direction_y)
                                    && grid[i_ + direction_x][j_ + direction_y].interior;
@@ -365,10 +386,6 @@ void Grid::weight_calculate() {
             }
         }
     }
-}
-
-std::array<double, 5> Grid::macro_at(size_t, size_t) {
-    return std::array<double, 5>();
 }
 
 #endif // LBM_CPP_POINT_H
