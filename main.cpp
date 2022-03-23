@@ -55,7 +55,7 @@ void check_conservation_laws(const Grid &g, physical_values &pv, bool print = tr
 void print_mass_flow(const Grid &g) {
     double mass_flow = 0;
     for (size_t j = 1; j < y_size; ++j) {
-        mass_flow += g.grid[50][j].rho * g.grid[50][j].v.x;
+        mass_flow += g.grid[x_size / 2][j].rho * g.grid[x_size / 2.][j].v.x;
     }
     std::cout << "Q: " << mass_flow << std::endl;
 }
@@ -124,8 +124,8 @@ void start_transfer_collision_loop(Grid &g) {
         if (t % 100 == 0) {
             ExportToVtk(g.grid, x_size + 1, y_size + 1, t);
         }
-        g.maintain_open_boundaries();
         g.transfer();
+        g.maintain_open_boundaries();
         for (size_t i = 0; i <= x_size; ++i) {
             for (size_t j = 0; j <= y_size; ++j) {
                 if (g.grid[i][j].interior) {
